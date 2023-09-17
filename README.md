@@ -46,7 +46,7 @@ Gestion de la connexion de l’internaute et affichage d’un "mur" d’accueil.
 
 ### 1. Procédure de connexion pour un internaute enregistré dans la base de données PostgreSQL.
 
-Pour l'instant seul la connection est gérée, la déconnexion sera gérée plus tard.
+Gestion de la connexion et de la déconnexion.
 
 - Echange des données entre le client et le serveur (requête/réponse HTTPS) pour l’envoi des informations de connexion et l’état de connexion.
 
