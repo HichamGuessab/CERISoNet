@@ -39,3 +39,17 @@ rm csr.pem
 ### 3. Association du formulaire de connexion dans le fichier index.html à une méthode de type GET et à une URL [https://pedago.univ-avignon.fr:3xxx/](https://pedago.univ-avignon.fr:3xxx/)
 
 - Le traitement de la requête côté serveur, après saisie des informations de login/mot de passe et envoi du formulaire, permet la réception des paramètres de connexion et leur affichage dans la console de log.
+
+## Etape 2 - Front-end (Angular) & Back-end (NodeJS)
+
+Gestion de la connexion de l’internaute et affichage d’un "mur" d’accueil.
+
+### 1. Procédure de connexion pour un internaute enregistré dans la base de données PostgreSQL.
+
+Pour l'instant seul la connection est gérée, la déconnexion sera gérée plus tard.
+
+- Echange des données entre le client et le serveur (requête/réponse HTTPS) pour l’envoi des informations de connexion et l’état de connexion.
+
+- Gestion de la connexion à la base de données PostgreSQL et consultation de la table users côté serveur pour la vérification des données de connexion de l’internaute (identifiant+mot de passe).
+
+- Sauvegarde des données de connexion par le gestionnaire de sessions associé à un store reposant sur le middleware MongoDBSession.
