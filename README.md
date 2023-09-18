@@ -109,3 +109,11 @@ Cette étape s'effectue après le build et dans le fichier `server.js`.
 
 - Utilisation de la variable `__dirname`.
 - Utilisation du middleware `express.static()`.
+
+
+#### Création des premiers composants
+
+```bash
+npx ng generate component bandeau
+npx ng generate component login
+```
