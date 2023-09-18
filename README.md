@@ -53,3 +53,59 @@ Gestion de la connexion et de la déconnexion.
 - Gestion de la connexion à la base de données PostgreSQL et consultation de la table users côté serveur pour la vérification des données de connexion de l’internaute (identifiant+mot de passe).
 
 - Sauvegarde des données de connexion par le gestionnaire de sessions associé à un store reposant sur le middleware MongoDBSession.
+
+### 2. Création du projet Angular et liaison avec les fichiers générés.
+
+#### Installation locale d'Angular
+
+```bash
+npm install @angular/cli
+```
+
+----
+
+#### Utilisation de npx afin de générer un nouveau projet Angular.
+
+Attention, à partir de là un dossier CERISoNet (projet Angular) est créé dans mon dossier CERISoNet.
+
+```bash
+npx ng new CERISoNet
+```
+
+----
+
+#### Installation de bootstrap et Jquery.
+
+```bash
+cd CERISoNet
+npm install bootstrap@3
+npm install jquery
+```
+
+L'ajout doit ensuite se faire dans le fichier `angular.json` sous la section `scripts`.
+```json
+"scripts": [
+  "node_modules/jquery/dist/jquery.min.js",
+  "node_modules/bootstrap/dist/js/bootstrap.min.js"
+]
+```
+----
+
+#### Build du projet.
+
+Il est nécessaire de build le projet afin de pouvoir utiliser les fichiers html générées du projet Angular.
+
+```bash
+npx ng build
+```
+Les fichiers sont générés dans le dossier `dist/ceriso-net`.  
+Ce dossier est spécifié dans le fichier `angular.json` de la racine du projet Angular (Clé `outputPath` des `options` de la clé `architect`).
+
+----
+
+#### Liaison du fichier index.html créé dans le dossier de build.
+
+Cette étape s'effectue après le build et dans le fichier `server.js`.
+
+- Utilisation de la variable `__dirname`.
+- Utilisation du middleware `express.static()`.

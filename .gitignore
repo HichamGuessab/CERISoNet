@@ -1,0 +1,40 @@
+# Compiled output
+CERISoNet/dist
+CERISoNet/tmp
+CERISoNet/out-tsc
+CERISoNet/bazel-out
+
+# Node
+CERISoNet/node_modules
+CERISoNet/npm-debug.log
+CERISoNet/yarn-error.log
+
+# IDEs and editors
+CERISoNet/.idea/
+CERISoNet/.project
+CERISoNet/.classpath
+CERISoNet/.c9/
+CERISoNet/*.launch
+CERISoNet/.settings/
+CERISoNet/*.sublime-workspace
+
+# Visual Studio Code
+CERISoNet/.vscode/*
+CERISoNet/!.vscode/settings.json
+CERISoNet/!.vscode/tasks.json
+CERISoNet/!.vscode/launch.json
+CERISoNet/!.vscode/extensions.json
+CERISoNet/.history/*
+
+# Miscellaneous
+CERISoNet/.angular/cache
+CERISoNet/.sass-cache/
+CERISoNet/connect.lock
+CERISoNet/coverage
+CERISoNet/libpeerconnection.log
+CERISoNet/testem.log
+CERISoNet/typings
+
+# System files
+CERISoNet/.DS_Store
+CERISoNet/Thumbs.db

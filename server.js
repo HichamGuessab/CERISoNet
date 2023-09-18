@@ -6,6 +6,7 @@ const request = require('node:http');
 const bodyParser = require('body-parser');
 const sha1 = require('js-sha1');
 const session = require('express-session');
+const path = require('path');
 
 const MongoDBStore = require('connect-mongodb-session')(session)  
 
@@ -21,7 +22,7 @@ const options = { // lecture clé privée et certificat
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json({limit: '10mb'}));
 
-// https://pedago.univ-avignon.fr:3242/
+// https://pedago.univ-avignon.fr:3201/
 const server = https.createServer(options, app);
 server.listen(port, () => {
   console.log("Running on port", port)
@@ -40,11 +41,14 @@ app.use(session({
   cookie : {maxAge : 24 * 3600 * 1000} // millisecond valeur par défaut
 }));
 
+app.use(express.static(path.join(__dirname, 'CERISoNet/dist/ceriso-net')));
+
 // Accueil
+// Faudra peut être mettre une "*" à la place d'un "/" pour que la route fonctionne sur toutes les routes d'Angular...?
 app.get('/', (req, res) => {
-  const indexHTML = fs.createReadStream('index.html');
-  indexHTML.pipe(res);
-})
+  const indexPath = path.join(__dirname, 'CERISoNet/dist/ceriso-net', 'index.html');
+  res.sendFile(indexPath);
+});
 
 // Connexion
 app.post('/login', (req, res) => {
