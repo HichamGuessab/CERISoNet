@@ -38,3 +38,6 @@ CERISoNet/typings
 # System files
 CERISoNet/.DS_Store
 CERISoNet/Thumbs.db
+
+node_modules/
+.idea
