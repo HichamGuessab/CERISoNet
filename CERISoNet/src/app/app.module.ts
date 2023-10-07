@@ -4,13 +4,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
-import { BandeauComponent } from './bandeau/bandeau.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
-    BandeauComponent
+    LoginComponent
   ],
   imports: [
     BrowserModule,

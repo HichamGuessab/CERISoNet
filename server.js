@@ -2,13 +2,12 @@ const express = require('express');
 const https = require('node:https');
 const fs = require('fs'); // module de gestion des fichiers
 const pgClient = require('pg');
-const request = require('node:http');
 const bodyParser = require('body-parser');
 const sha1 = require('js-sha1');
 const session = require('express-session');
 const path = require('path');
 
-const MongoDBStore = require('connect-mongodb-session')(session)  
+const MongoDBStore = require('connect-mongodb-session')(session)
 
 const app = express(); // appel à expressJS
 const port = 3201; // port définit
@@ -44,14 +43,13 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'CERISoNet/dist/ceriso-net')));
 
 // Accueil
-// Faudra peut être mettre une "*" à la place d'un "/" pour que la route fonctionne sur toutes les routes d'Angular...?
 app.get('/', (req, res) => {
   const indexPath = path.join(__dirname, 'CERISoNet/dist/ceriso-net', 'index.html');
   res.sendFile(indexPath);
 });
 
 // Connexion
-app.post('/login', (req, res) => {
+app.get('/login', (req, res) => {
   const identifiant = req.body.identifiant;
   const motdepasse = sha1(req.body.mot_de_passe);
   console.log(identifiant + " " + motdepasse);
@@ -61,6 +59,7 @@ app.post('/login', (req, res) => {
   connexionObj.connect((err, client, done) => {
     if(err) {
       console.log('Erreur de connexion au serveur pg' + err.stack);
+      responseData.statusMsg = 'Erreur de connexion au serveur pg.';
     } else {
       console.log('Connexion établie / pg db server');
 
@@ -70,8 +69,6 @@ app.post('/login', (req, res) => {
         if(err) {
           console.log('Erreur d execution de la requete' + err.stack);
           responseData.statusMsg = 'Connexion échouée';
-          const failedHTML = fs.createReadStream('failed.html');
-          failedHTML.pipe(res);
         } 
         else if ((result.rows[0] != null) && (result.rows[0].motpasse == motdepasse)) {
           req.session.isConnected = true;
@@ -90,16 +87,12 @@ app.post('/login', (req, res) => {
             } else {
               console.log('Statut de connexion mis à jour dans la base de données.');
               responseData.statusMsg += 'Statut de connexion mis à jour dans la base de données.';
-              const loggedHTML = fs.createReadStream('logged.html');
-              loggedHTML.pipe(res);
             }
           });
         }
         else {
           console.log('Connexion échouée : informations de connexion incorrectes.');
           responseData.statusMsg='Connexion échouée : informations de connexion incorrectes.';
-          const failedHTML = fs.createReadStream('failed.html');
-          failedHTML.pipe(res);
         }
       })
     }
@@ -108,7 +101,7 @@ app.post('/login', (req, res) => {
 })
 
 // Déconnexion
-app.post('/logout', (req, res) => {
+app.get('/logout', (req, res) => {
   if (req.session.isConnected) {
     const identifiant = req.session.identifiant;
 
@@ -138,8 +131,6 @@ app.post('/logout', (req, res) => {
       } else {
         console.log('Utilisateur déconnecté avec succès.');
       }
-      const logoutHTML = fs.createReadStream('logout.html');
-      logoutHTML.pipe(res);
     });
   } else {
     // L'utilisateur n'était pas connecté
