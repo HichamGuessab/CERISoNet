@@ -11,7 +11,12 @@ export class AuthentificationService {
 
   constructor(
     private http: HttpClient,
-    private notificationService: NotificationService) { }
+    private notificationService: NotificationService) {
+    const isConnected = sessionStorage.getItem('isConnected');
+    if (isConnected === 'true') {
+      this.connectedSubject.next(true);
+    }
+  }
 
   getConnectedObservable(): Observable<boolean> {
     return this.connectedSubject.asObservable();
@@ -24,6 +29,7 @@ export class AuthentificationService {
       next: response => {
         this.connectedSubject.next(true);
         this.notificationService.publish(response.message)
+        sessionStorage.setItem('isConnected', 'true');
       },
       error: (error: any) => {
         this.connectedSubject.next(false);
@@ -42,6 +48,7 @@ export class AuthentificationService {
         console.log("false: " + this.connectedSubject.getValue());
         console.log('Réponse du serveur : ', response);
         this.notificationService.publish(response.message)
+        sessionStorage.removeItem('isConnected');
       },
       error: (error: any) => {
         console.error('Erreur lors de la déconnexion : ', error.error.message);
