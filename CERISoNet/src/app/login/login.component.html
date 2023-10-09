@@ -1,21 +1,51 @@
-<div class="container-fluid">
+<div
+  class="container-fluid">
     <div class="row">
         <div class="col-md-2 col-md-offset-10">
-            <div class="panel panel-default">
+            <div
+              class="panel panel-default"
+              *ngIf="isConnected()">
+              <button
+                class="btn btn-danger"
+                (click)="OnDeconnexion()">Se déconnecter</button>
+            </div>
+
+            <div class="panel panel-default"
+                *ngIf="!isConnected()">
                 <div class="panel-heading">
                     <h3 class="panel-title">Connexion</h3>
                 </div>
                 <div class="panel-body">
-                    <form method="post" action="/login" role="form">
+                    <form
+                      role="form"
+                      (ngSubmit)="onConnexion()"
+                      #form="ngForm">
                         <div class="form-group">
                             <label for="identifiant">Identifiant</label>
-                            <input type="text" class="form-control" id="identifiant" name="identifiant" placeholder="Votre identifiant">
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="identifiant"
+                              name="identifiant"
+                              placeholder="Votre identifiant"
+                              [(ngModel)]="identifiant"
+                              required>
                         </div>
                         <div class="form-group">
                             <label for="mot_de_passe">Mot de passe</label>
-                            <input type="password" class="form-control" id="mot_de_passe" name="mot_de_passe" placeholder="Votre mot de passe">
+                            <input
+                              type="password"
+                              class="form-control"
+                              id="mot_de_passe"
+                              name="mot_de_passe"
+                              placeholder="Votre mot de passe"
+                              [(ngModel)]="mot_de_passe"
+                              required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Se Connecter</button>
+                        <button
+                          type="submit"
+                          class="btn btn-primary"
+                          [disabled]="!form.valid">Se Connecter</button>
                     </form>
                 </div>
             </div>
