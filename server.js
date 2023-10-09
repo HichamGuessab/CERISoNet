@@ -53,9 +53,6 @@ app.post('/login', (req, res) => {
   const identifiant = req.body.identifiant;
   const motdepasse = sha1(req.body.mot_de_passe);
 
-  // Pour renvoyer les messages du serveur au niveau client.
-  const responseData = {};
-
   let sql = "select * from fredouil.users where identifiant='" + identifiant + "';";
 
   const connexionObj = new pgClient.Pool({user:'uapv2102872', host:'127.0.0.1', database:'etd', password: 'jhFP6M', port:5432});
@@ -64,6 +61,7 @@ app.post('/login', (req, res) => {
     if(err) {
       console.log('Erreur de connexion au serveur pg.');
       message = 'Erreur de connexion au serveur pg.';
+      res.status(401).send({ message: message });
     } else {
       console.log('Connexion établie / pg db server');
       message = 'Connexion établie / pg db server';
@@ -73,7 +71,7 @@ app.post('/login', (req, res) => {
         if(err) {
           console.log('Erreur d execution de la requete' + err.stack);
           message += 'Erreur d execution de la requete';
-          res.send({ message: message })
+          res.status(401).send({ message: message });
         } 
         else if ((result.rows[0] != null) && (result.rows[0].motpasse == motdepasse)) {
           req.session.isConnected = true;
