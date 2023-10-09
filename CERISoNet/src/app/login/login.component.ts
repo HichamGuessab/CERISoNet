@@ -1,20 +1,26 @@
-import {Component, ViewChild} from '@angular/core';
-import {NgForm} from "@angular/forms";
-import {Router} from "@angular/router";
+import {Component, OnInit} from '@angular/core';
 import {AuthentificationService} from "../authentification.service";
 
 @Component({
     selector : 'app-login',
     templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   identifiant: string = '';
   mot_de_passe: string = '';
+  isConnected: boolean = false;
 
   constructor(
-    private router: Router,
     private authentificationService: AuthentificationService
   ) {
+  }
+
+  ngOnInit() {
+    // Écoute de l'observable de connexion
+    this.authentificationService.getConnectedObservable().subscribe((connected) => {
+      this.isConnected = connected;
+      console.log(this.isConnected);
+    });
   }
 
   onConnexion() {
@@ -27,9 +33,5 @@ export class LoginComponent {
 
   OnDeconnexion() {
     this.authentificationService.deconnexion();
-  }
-
-  isConnected() {
-    return this.authentificationService.connectedSubject.getValue();
   }
 }

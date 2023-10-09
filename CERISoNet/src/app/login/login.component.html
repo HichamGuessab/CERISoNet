@@ -4,14 +4,14 @@
         <div class="col-md-2 col-md-offset-10">
             <div
               class="panel panel-default"
-              *ngIf="isConnected()">
+              *ngIf="isConnected">
               <button
                 class="btn btn-danger"
                 (click)="OnDeconnexion()">Se déconnecter</button>
             </div>
 
             <div class="panel panel-default"
-                *ngIf="!isConnected()">
+                *ngIf="!isConnected">
                 <div class="panel-heading">
                     <h3 class="panel-title">Connexion</h3>
                 </div>

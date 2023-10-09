@@ -7,11 +7,13 @@ import { LoginComponent } from './login/login.component';
 import {FormsModule} from "@angular/forms";
 import {AuthentificationService} from "./authentification.service";
 import {HttpClientModule} from "@angular/common/http";
+import { NotificationComponent } from './notification/notification.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    LoginComponent,
+    NotificationComponent
   ],
     imports: [
         BrowserModule,

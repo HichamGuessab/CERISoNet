@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {response} from "express";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
+import {NotificationService} from "./notification.service";
 
 @Injectable({
   providedIn: 'root'
@@ -9,30 +9,43 @@ import {BehaviorSubject} from "rxjs";
 export class AuthentificationService {
   connectedSubject = new BehaviorSubject<boolean>(false);
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private notificationService: NotificationService) { }
+
+  getConnectedObservable(): Observable<boolean> {
+    return this.connectedSubject.asObservable();
+  }
 
   connexion(formData: any) {
     console.log("Appel à la connexion : ")
-    this.http.post('/login', formData).subscribe({
+    // On indique absolument que l'objet possède un objet message de type string pour pouvoir l'utiliser.
+    this.http.post<{ message: string }>('/login', formData).subscribe({
       next: response => {
         this.connectedSubject.next(true);
-        console.log('Réponse du serveur : ', response);
+        this.notificationService.publish(response.message)
       },
-      error: error => {
-        console.error('Erreur lors de la connexion : ', error);
+      error: (error: any) => {
+        this.connectedSubject.next(false);
+        console.error('Erreur lors de la déconnexion : ', error.error.message);
+        this.notificationService.publish(error.error.message)
       }
     })
   }
 
   deconnexion() {
     console.log("Appel à la déconnexion : ")
-    this.http.get('/logout').subscribe(  {
+    // On indique absolument que l'objet possède un objet message de type string pour pouvoir l'utiliser.
+    this.http.get<{ message: string }>('/logout').subscribe(  {
       next: response => {
         this.connectedSubject.next(false);
+        console.log("false: " + this.connectedSubject.getValue());
         console.log('Réponse du serveur : ', response);
+        this.notificationService.publish(response.message)
       },
-      error: error => {
-        console.error('Erreur lors de la déconnexion : ', error);
+      error: (error: any) => {
+        console.error('Erreur lors de la déconnexion : ', error.error.message);
+        this.notificationService.publish(error.error.message)
       }
     })
   }
