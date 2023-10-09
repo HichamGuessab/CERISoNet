@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {NotificationService} from "../notification.service";
+import {AuthentificationService} from "../authentification.service";
 
 @Component({
   selector: 'app-notification',
@@ -7,10 +8,20 @@ import {NotificationService} from "../notification.service";
 })
 export class NotificationComponent implements OnInit {
   notificationMessage: string = '';
+  lastConnexion = localStorage.getItem('lastConnexion');
+  isConnected: boolean;
 
-  constructor(private notificationService: NotificationService) {}
+  constructor(private notificationService: NotificationService,
+              private authentificationService: AuthentificationService) {}
 
   ngOnInit() {
+    this.authentificationService.getConnectedObservable().subscribe((isConnected) => {
+      this.isConnected = isConnected;
+    })
+
+    this.authentificationService.getlastConnexionObservable().subscribe((lastConnexion) => {
+      this.lastConnexion = lastConnexion;
+    });
     // Ecoute les notifications
     this.notificationService.getObservable().subscribe((message) => {
       this.notificationMessage = message;

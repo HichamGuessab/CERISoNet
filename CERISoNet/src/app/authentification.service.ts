@@ -8,6 +8,9 @@ import {NotificationService} from "./notification.service";
 })
 export class AuthentificationService {
   connectedSubject = new BehaviorSubject<boolean>(false);
+  lastConnexionSubject = new BehaviorSubject<string>("");
+  lastConnexion: string = "";
+  nowConnexion: string = "";
 
   constructor(
     private http: HttpClient,
@@ -30,6 +33,8 @@ export class AuthentificationService {
         this.connectedSubject.next(true);
         this.notificationService.publish(response.message)
         sessionStorage.setItem('isConnected', 'true');
+        this.nowConnexion = new Date().toLocaleString();
+        this.lastConnexionSubject.next(this.lastConnexion);
       },
       error: (error: any) => {
         this.connectedSubject.next(false);
@@ -41,7 +46,7 @@ export class AuthentificationService {
 
   deconnexion() {
     console.log("Appel à la déconnexion : ")
-    // On indique absolument que l'objet possède un objet message de type string pour pouvoir l'utiliser.
+
     this.http.get<{ message: string }>('/logout').subscribe(  {
       next: response => {
         this.connectedSubject.next(false);
@@ -49,11 +54,17 @@ export class AuthentificationService {
         console.log('Réponse du serveur : ', response);
         this.notificationService.publish(response.message)
         sessionStorage.removeItem('isConnected');
+        localStorage.setItem('lastConnexion', this.nowConnexion);
+        this.lastConnexion = this.nowConnexion;
       },
       error: (error: any) => {
         console.error('Erreur lors de la déconnexion : ', error.error.message);
         this.notificationService.publish(error.error.message)
       }
     })
+  }
+
+  getlastConnexionObservable(): Observable<string> {
+    return this.lastConnexionSubject.asObservable();
   }
 }

@@ -1,5 +1,6 @@
 <div class="container-fluid">
   <div class="alert alert-info" *ngIf="notificationMessage">
-    {{ notificationMessage }}
+    <p>{{ notificationMessage }}</p>
+    <p *ngIf="isConnected"> Dernière connexion : {{ lastConnexion }}</p>
   </div>
 </div>
