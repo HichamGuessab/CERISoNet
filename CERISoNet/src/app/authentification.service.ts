@@ -16,6 +16,7 @@ export class AuthentificationService {
     private http: HttpClient,
     private notificationService: NotificationService) {
     const isConnected = sessionStorage.getItem('isConnected');
+    this.lastConnexion = localStorage.getItem('lastConnexion');
     if (isConnected === 'true') {
       this.connectedSubject.next(true);
     }
@@ -34,6 +35,7 @@ export class AuthentificationService {
         this.notificationService.publish(response.message)
         sessionStorage.setItem('isConnected', 'true');
         this.nowConnexion = new Date().toLocaleString();
+        this.lastConnexion = localStorage.getItem('lastConnexion');
         this.lastConnexionSubject.next(this.lastConnexion);
       },
       error: (error: any) => {

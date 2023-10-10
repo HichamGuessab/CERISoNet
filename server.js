@@ -4,9 +4,9 @@ const fs = require('fs'); // module de gestion des fichiers
 const pgClient = require('pg');
 const bodyParser = require('body-parser');
 const sha1 = require('js-sha1');
-const session = require('express-session');
 const path = require('path');
 
+const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session)
 
 const app = express(); // appel à expressJS
