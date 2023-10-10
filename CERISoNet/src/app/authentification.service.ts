@@ -15,15 +15,24 @@ export class AuthentificationService {
   constructor(
     private http: HttpClient,
     private notificationService: NotificationService) {
-    const isConnected = sessionStorage.getItem('isConnected');
     this.lastConnexion = localStorage.getItem('lastConnexion');
-    if (isConnected === 'true') {
-      this.connectedSubject.next(true);
-    }
+    this.checkConnexion();
   }
 
   getConnectedObservable(): Observable<boolean> {
     return this.connectedSubject.asObservable();
+  }
+
+  checkConnexion() {
+    this.http.get<{ isConnected: boolean }>('/checkConnexion').subscribe({
+      next: response => {
+        console.log("J'y suis : " + response.isConnected);
+        this.connectedSubject.next(response.isConnected);
+      },
+      error: error => {
+        return error.message;
+      }
+    })
   }
 
   connexion(formData: any) {
@@ -31,15 +40,14 @@ export class AuthentificationService {
     // On indique absolument que l'objet possède un objet message de type string pour pouvoir l'utiliser.
     this.http.post<{ message: string }>('/login', formData).subscribe({
       next: response => {
-        this.connectedSubject.next(true);
+        this.checkConnexion();
         this.notificationService.publish(response.message)
-        sessionStorage.setItem('isConnected', 'true');
         this.nowConnexion = new Date().toLocaleString();
         this.lastConnexion = localStorage.getItem('lastConnexion');
         this.lastConnexionSubject.next(this.lastConnexion);
       },
       error: (error: any) => {
-        this.connectedSubject.next(false);
+        this.checkConnexion();
         console.error('Erreur lors de la déconnexion : ', error.error.message);
         this.notificationService.publish(error.error.message)
       }
@@ -51,11 +59,11 @@ export class AuthentificationService {
 
     this.http.get<{ message: string }>('/logout').subscribe(  {
       next: response => {
-        this.connectedSubject.next(false);
-        console.log("false: " + this.connectedSubject.getValue());
+        this.checkConnexion();
+        console.log("false: " + this.checkConnexion());
         console.log('Réponse du serveur : ', response);
         this.notificationService.publish(response.message)
-        sessionStorage.removeItem('isConnected');
+        this.checkConnexion();
         localStorage.setItem('lastConnexion', this.nowConnexion);
         this.lastConnexion = this.nowConnexion;
       },

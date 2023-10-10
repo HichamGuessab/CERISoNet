@@ -15,14 +15,17 @@ export class NotificationComponent implements OnInit {
               private authentificationService: AuthentificationService) {}
 
   ngOnInit() {
+    // IsConnected
     this.authentificationService.getConnectedObservable().subscribe((isConnected) => {
       this.isConnected = isConnected;
     })
 
+    // Last Connexion
     this.authentificationService.getlastConnexionObservable().subscribe((lastConnexion) => {
       this.lastConnexion = lastConnexion;
     });
-    // Ecoute les notifications
+
+    // Notifications
     this.notificationService.getObservable().subscribe((message) => {
       this.notificationMessage = message;
       setTimeout(() => {

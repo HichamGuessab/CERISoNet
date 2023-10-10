@@ -146,3 +146,11 @@ app.get('/logout', (req, res) => {
     res.send({ message : "Erreur : Vous n'étiez pas connecté."});
   }
 });
+
+app.get('/checkConnexion', (req, res) => {
+  if(req.session.isConnected) {
+    res.send( { isConnected : true } )
+  } else {
+    res.send( { isConnected : false } )
+  }
+})
