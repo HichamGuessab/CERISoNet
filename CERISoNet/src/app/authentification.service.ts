@@ -40,6 +40,8 @@ export class AuthentificationService {
         this.nowConnexion = new Date().toLocaleString();
         this.lastConnexion = localStorage.getItem('lastConnexion');
         this.lastConnexionSubject.next(this.lastConnexion);
+        localStorage.setItem('lastConnexion', this.nowConnexion);
+        this.lastConnexion = this.nowConnexion;
       },
       error: (error: any) => {
         this.checkConnexion();
@@ -52,17 +54,13 @@ export class AuthentificationService {
   deconnexion() {
     console.log("Appel à la déconnexion : ")
 
-    this.http.get<{ message: string }>('/logout').subscribe(  {
+    this.http.get<{ message: string }>('/logout').subscribe({
       next: response => {
         this.checkConnexion();
-        console.log("false: " + this.checkConnexion());
-        console.log('Réponse du serveur : ', response);
         this.notificationService.publish(response.message)
-        this.checkConnexion();
-        localStorage.setItem('lastConnexion', this.nowConnexion);
-        this.lastConnexion = this.nowConnexion;
       },
       error: (error: any) => {
+        this.checkConnexion();
         console.error('Erreur lors de la déconnexion : ', error.error.message);
         this.notificationService.publish(error.error.message)
       }

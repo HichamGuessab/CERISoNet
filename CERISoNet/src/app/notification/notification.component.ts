@@ -29,8 +29,8 @@ export class NotificationComponent implements OnInit {
     this.notificationService.getObservable().subscribe((message) => {
       this.notificationMessage = message;
       setTimeout(() => {
-        this.notificationMessage = ''; // Effacer la notification après 7 secondes
-      }, 7000);
+        this.notificationMessage = ''; // Effacer la notification après 10 secondes
+      }, 10000);
     });
   }
 
