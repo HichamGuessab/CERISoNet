@@ -7,7 +7,7 @@ import {NotificationService} from "./notification.service";
   providedIn: 'root'
 })
 export class AuthentificationService {
-  connectedSubject = new BehaviorSubject<boolean>(false);
+  isConnectedSubject = new BehaviorSubject<boolean>(false);
   lastConnexionSubject = new BehaviorSubject<string>("");
   lastConnexion: string = "";
   nowConnexion: string = "";
@@ -19,15 +19,10 @@ export class AuthentificationService {
     this.checkConnexion();
   }
 
-  getConnectedObservable(): Observable<boolean> {
-    return this.connectedSubject.asObservable();
-  }
-
   checkConnexion() {
     this.http.get<{ isConnected: boolean }>('/checkConnexion').subscribe({
       next: response => {
-        console.log("J'y suis : " + response.isConnected);
-        this.connectedSubject.next(response.isConnected);
+        this.isConnectedSubject.next(response.isConnected);
       },
       error: error => {
         return error.message;
@@ -76,5 +71,9 @@ export class AuthentificationService {
 
   getlastConnexionObservable(): Observable<string> {
     return this.lastConnexionSubject.asObservable();
+  }
+
+  getIsConnectedObservable(): Observable<boolean> {
+    return this.isConnectedSubject.asObservable();
   }
 }

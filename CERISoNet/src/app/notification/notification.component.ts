@@ -16,7 +16,7 @@ export class NotificationComponent implements OnInit {
 
   ngOnInit() {
     // IsConnected
-    this.authentificationService.getConnectedObservable().subscribe((isConnected) => {
+    this.authentificationService.getIsConnectedObservable().subscribe((isConnected) => {
       this.isConnected = isConnected;
     })
 

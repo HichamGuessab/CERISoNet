@@ -17,9 +17,8 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     // Écoute de l'observable de connexion
-    this.authentificationService.getConnectedObservable().subscribe((connected) => {
+    this.authentificationService.getIsConnectedObservable().subscribe((connected) => {
       this.isConnected = connected;
-      console.log(this.isConnected);
     });
   }
 
