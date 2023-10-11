@@ -1,6 +1,8 @@
 <div class="container-fluid">
-  <div class="alert alert-info" *ngIf="notificationMessage">
-    <p>{{ notificationMessage }}</p>
-    <p *ngIf="isConnected"> Dernière connexion : {{ lastConnexion }}</p>
+  <div class="position-fixed top-10 start-50 translate-middle-x" style="z-index: 1050">
+    <div class="alert alert-info position-relative" *ngIf="notificationMessage">
+      <button type="button" class="btn-close btn-sm position-absolute top-0 end-0" aria-label="Close" (click)="closeNotification()"></button>
+      <p>{{ notificationMessage }}</p>
+    </div>
   </div>
 </div>

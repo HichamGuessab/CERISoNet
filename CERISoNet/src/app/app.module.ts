@@ -8,12 +8,14 @@ import {FormsModule} from "@angular/forms";
 import {AuthentificationService} from "./authentification.service";
 import {HttpClientModule} from "@angular/common/http";
 import { NotificationComponent } from './notification/notification.component';
+import { HeaderComponent } from './header/header.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    NotificationComponent
+    NotificationComponent,
+    HeaderComponent
   ],
     imports: [
         BrowserModule,
