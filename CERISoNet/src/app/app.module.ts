@@ -9,13 +9,15 @@ import {AuthentificationService} from "./authentification.service";
 import {HttpClientModule} from "@angular/common/http";
 import { NotificationComponent } from './notification/notification.component';
 import { HeaderComponent } from './header/header.component';
+import { MessageComponent } from './message/message.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     NotificationComponent,
-    HeaderComponent
+    HeaderComponent,
+    MessageComponent
   ],
     imports: [
         BrowserModule,
