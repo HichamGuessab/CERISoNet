@@ -8,12 +8,19 @@ import {Message} from "../../models/message.model";
 })
 export class MessageContainerComponent implements OnInit{
   messages: Message[] = [];
+  defaultMessage = new Message();
 
   constructor(private messageService: MessageService) {}
 
   ngOnInit() {
     this.messageService.getMessages().subscribe((messages) => {
-      this.messages = messages;
+      for (let message of messages) {
+        this.messages.push(this.initialisation(message))
+      }
     })
+  }
+
+  initialisation(message: Message) {
+    return { ...this.defaultMessage, ...message };
   }
 }
