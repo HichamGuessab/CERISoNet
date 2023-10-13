@@ -10,6 +10,9 @@ import {HttpClientModule} from "@angular/common/http";
 import { NotificationComponent } from './notification/notification.component';
 import { HeaderComponent } from './header/header.component';
 import { MessageComponent } from './message/message.component';
+import { MessageContainerComponent } from './message-container/message-container.component';
+import { CommentaireContainerComponent } from './commentaire-container/commentaire-container.component';
+import { CommentaireComponent } from './commentaire/commentaire.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +20,10 @@ import { MessageComponent } from './message/message.component';
     LoginComponent,
     NotificationComponent,
     HeaderComponent,
-    MessageComponent
+    MessageComponent,
+    MessageContainerComponent,
+    CommentaireContainerComponent,
+    CommentaireComponent
   ],
     imports: [
         BrowserModule,
