@@ -154,3 +154,20 @@ app.get('/checkConnexion', (req, res) => {
     res.send( { isConnected : false } )
   }
 })
+
+const { client, dbName } = require('./mongodb.config.js');
+
+app.get('/messages', async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('CERISoNet');
+    const messages = await collection.find({}).toArray();
+    res.json(messages);
+  } catch (err) {
+    console.error('Erreur lors de la récupération des messages :', err);
+    res.status(500).json({message: 'Erreur lors de la récupération des messages.'})
+  } finally {
+    client.close();
+  }
+})
