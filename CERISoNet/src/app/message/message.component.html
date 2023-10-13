@@ -1,6 +1,6 @@
 <div *ngFor="let message of messages">
   <!-- Message -->
-  <div class="container col-7 mt-2">
+  <div class="container col-8 mt-2">
 
     <!-- Contenu du Message-->
     <div class="card text-white bg-dark mb-0 pb-0">
@@ -24,17 +24,21 @@
           <small> {{ message.hashtags }}</small>
         </p>
       </div>
+
       <div class="row mx-2">
-        <p class="card-text col-2 py-0">
+        <p class="card-text col-2">
           <small>Auteur : {{ message.createdBy }}</small>
         </p>
-        <p class="card-text col-8">
+        <p class="card-text col">
           <small>Le {{ message.date }} à {{ message.hour }}</small>
         </p>
-        <p class="card-text col-1">
-          <small>{{ message.likes }} likes</small>
+        <p class="btn btn-sm btn-dark text-white col-1">
+          <small>Liker ({{ message.likes }})</small>
         </p>
-        <p class="card-text col-1">
+        <p class="btn btn-sm btn-dark text-white col-1">
+          <small>Commenter</small>
+        </p>
+        <p class="btn btn-sm btn-dark text-white col-1">
           <small>Partager</small>
         </p>
       </div>
