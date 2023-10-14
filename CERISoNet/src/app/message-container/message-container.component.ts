@@ -12,20 +12,28 @@ export class MessageContainerComponent implements OnInit{
   defaultMessage: Message = new Message();
   messagesPerPage: number = 4;
   currentPage: number = 1;
-  totalMessages: number;
   totalPages: number;
   sortBy: 'owner' | 'date' | 'popularity' = 'date';
+  selectedOwner: number | null = null;
+  selectedHashtag: string | null = null;
+  uniqueOwners: any[];
+  uniqueHashtags: any[];
+
 
   constructor(private messageService: MessageService) {}
 
   ngOnInit() {
     this.messageService.getMessages().subscribe((messages) => {
-      this.totalMessages = messages.length
       for (let message of messages) {
         this.messages.push(this.initialisation(message))
       }
       this.messagesShowed = this.setIndex(this.messages);
       this.totalPages = Math.ceil(this.messages.length / this.messagesPerPage);
+
+      this.uniqueOwners = Array.from(new Set(messages.flatMap(message => message.createdBy)));
+      this.uniqueHashtags = Array.from(new Set(messages.flatMap(message => message.hashtags)));
+
+      console.log(this.uniqueOwners)
     })
   }
 
@@ -35,6 +43,8 @@ export class MessageContainerComponent implements OnInit{
 
   setIndex(messages: Message[]) {
     const startIndex = (this.currentPage - 1) * this.messagesPerPage;
+    console.log("page" + this.currentPage);
+    this.totalPages = Math.ceil(this.messages.length / this.messagesPerPage);
     return messages.slice(startIndex, startIndex + this.messagesPerPage);
   }
 
@@ -75,5 +85,31 @@ export class MessageContainerComponent implements OnInit{
     }
 
     this.messagesShowed = this.setIndex(this.messages);
+  }
+
+  filterByOwner(ownerId: number) {
+    this.messagesShowed = this.messages.filter(message => message.createdBy === ownerId);
+    this.currentPage = 1;
+    this.totalPages = Math.ceil(this.messagesShowed.length / this.messagesPerPage);
+  }
+
+  filterByHashtag(hashtag: string) {
+    this.messagesShowed = this.messages.filter(message => message.hashtags.includes(hashtag));
+    this.currentPage = 1;
+    this.totalPages = Math.ceil(this.messagesShowed.length / this.messagesPerPage);
+  }
+
+  filterMessages() {
+    if (this.selectedOwner !== null) {
+      this.filterByOwner(this.selectedOwner);
+    } else if (this.selectedHashtag !== null) {
+      this.filterByHashtag(this.selectedHashtag);
+    } else {
+
+      // Réinitialiser les filtres pour afficher tous les messages
+      this.messagesShowed = this.setIndex(this.messages);
+      this.currentPage = 1;
+      this.totalPages = Math.ceil(this.messages.length / this.messagesPerPage);
+    }
   }
 }

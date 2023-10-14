@@ -1,5 +1,6 @@
 <div class="container col-10">
   <div class="row justify-content-center my-2 bg-light border-black">
+    <!-- Pagination -->
     <div class="pagination col-auto my-1">
       <button class="btn btn-sm btn-outline-dark" (click)="previousPage()"
               [disabled]="currentPage === 1">Précédent
@@ -9,10 +10,24 @@
               [disabled]="!hasNextPage()">Suivant
       </button>
     </div>
-    <div class="btn-group">
+
+    <!-- Tri des messages -->
+    <div class="btn-group my-1">
       <button class="btn btn-outline-dark" (click)="changeSortBy('owner')" [class.active]="sortBy === 'owner'">Trier par Propriétaire</button>
       <button class="btn btn-outline-dark" (click)="changeSortBy('date')" [class.active]="sortBy === 'date'">Trier par Date</button>
       <button class="btn btn-outline-dark" (click)="changeSortBy('popularity')" [class.active]="sortBy === 'popularity'">Trier par Popularité</button>
+    </div>
+
+    <!-- Filtrage des messages -->
+    <div class="btn-group my-1">
+      <select class="btn btn-outline-dark col-6" [(ngModel)]="selectedOwner" (change)="filterMessages()">
+        <option class="dropdown-item" [ngValue]="null">Tous les propriétaires</option>
+        <option class="dropdown-item" *ngFor="let owner of uniqueOwners" [ngValue]="owner">{{ owner }}</option>
+      </select>
+      <select class="btn btn-outline-dark col-6" [(ngModel)]="selectedHashtag" (change)="filterMessages()">
+        <option class="dropdown-item" [ngValue]="null">Tous les hashtags</option>
+        <option class="dropdown-item" *ngFor="let hashtag of uniqueHashtags" [ngValue]="hashtag">{{ hashtag }}</option>
+      </select>
     </div>
   </div>
   <app-message
