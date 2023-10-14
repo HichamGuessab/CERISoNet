@@ -1,6 +1,28 @@
 <div class="container col-10">
+  <div class="row justify-content-center mt-2">
+    <div class="pagination col-auto">
+      <button class="btn btn-sm btn-outline-dark" (click)="previousPage()"
+              [disabled]="currentPage === 1">Précédent
+      </button>
+      <span class="badge bg-secondary justify-content-center pt-2">Page {{ currentPage }}</span>
+      <button class="btn btn-sm btn-outline-dark" (click)="nextPage()"
+              [disabled]="!hasNextPage()">Suivant
+      </button>
+    </div>
+  </div>
   <app-message
-    *ngFor="let message of messages"
+    *ngFor="let message of messagesShowed"
     [message]="message">
   </app-message>
+  <div class="row justify-content-center mt-2">
+    <ul class="pagination col-auto">
+      <button class="btn btn-sm btn-outline-dark" (click)="previousPage()"
+              [disabled]="currentPage === 1">Précédent
+      </button>
+      <span class="badge bg-secondary justify-content-center pt-2">Page {{ currentPage }}</span>
+      <button class="btn btn-sm btn-outline-dark" (click)="nextPage()"
+              [disabled]="!hasNextPage()">Suivant
+      </button>
+    </ul>
+  </div>
 </div>

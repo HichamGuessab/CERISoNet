@@ -1,54 +1,47 @@
+<!-- Contenu du Message-->
+<div class="card text-white bg-dark mb-0 pb-0">
 
-  <!-- Message -->
-  <div class="container col-12 mt-2">
-
-    <!-- Contenu du Message-->
-    <div class="card text-white bg-dark mb-0 pb-0">
-
-      <!-- Body -->
-      <div class="row mx-2">
-        <div class="card-body col-9">
-          <p class="card-text"> {{ message.body}}</p>
-        </div>
-
-        <!-- Image -->
-        <div class="card-body col-3">
-          <img class="card-img" [src]="message.images.url" alt="">
-          <h6 class="card-text pt-2 px-3">{{ message.images.title }}</h6>
-        </div>
-      </div>
-
-      <!-- Hashtags -->
-      <div class="row mx-2">
-          <div class="card-text py-1">
-            <small *ngFor="let hashtag of message.hashtags">
-              {{ hashtag }}
-            </small>
-          </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="row mx-2">
-        <p class="card-text col-2">
-          <small>Auteur : {{ message.createdBy }}</small>
-        </p>
-        <p class="card-text col">
-          <small>Le {{ message.date }} à {{ message.hour }}</small>
-        </p>
-        <p class="btn btn-sm btn-dark text-white col-1">
-          <small>Liker ({{ message.likes }})</small>
-        </p>
-        <p class="btn btn-sm btn-dark text-white col-1">
-          <small>Commenter</small>
-        </p>
-        <p class="btn btn-sm btn-dark text-white col-1">
-          <small>Partager ({{ message.shared }})</small>
-        </p>
-      </div>
+  <!-- Body -->
+  <div class="row mx-2">
+    <div class="card-body col-9">
+      <p class="card-text"> {{ message.body}}</p>
     </div>
 
-    <app-commentaire-container
-      [commentaires]="message.comments">
-    </app-commentaire-container>
-
+    <!-- Image -->
+    <div class="card-body col-3">
+      <img class="card-img" [src]="message.images.url" alt="">
+      <h6 class="card-text pt-2 px-3">{{ message.images.title }}</h6>
+    </div>
   </div>
+
+  <!-- Hashtags -->
+  <div class="row mx-2">
+      <div class="card-text py-1">
+        <small *ngFor="let hashtag of message.hashtags">
+          {{ hashtag }}
+        </small>
+      </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="row mx-2">
+    <p class="card-text col-2">
+      <small>Auteur : {{ message.createdBy }}</small>
+    </p>
+    <p class="card-text col">
+      <small>Le {{ message.date }} à {{ message.hour }}</small>
+    </p>
+    <p class="btn btn-sm btn-dark text-white col-1">
+      <small>Liker ({{ message.likes }})</small>
+    </p>
+    <p class="btn btn-sm btn-dark text-white col-1">
+      <small>Commenter</small>
+    </p>
+    <p class="btn btn-sm btn-dark text-white col-1">
+      <small>Partager ({{ message.shared }})</small>
+    </p>
+  </div>
+</div>
+<app-commentaire-container
+  [commentaires]="message.comments">
+</app-commentaire-container>

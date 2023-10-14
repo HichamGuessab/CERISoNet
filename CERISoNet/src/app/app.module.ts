@@ -13,6 +13,7 @@ import { MessageComponent } from './message/message.component';
 import { MessageContainerComponent } from './message-container/message-container.component';
 import { CommentaireContainerComponent } from './commentaire-container/commentaire-container.component';
 import { CommentaireComponent } from './commentaire/commentaire.component';
+import { PaginationComponent } from './pagination/pagination.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { CommentaireComponent } from './commentaire/commentaire.component';
     MessageComponent,
     MessageContainerComponent,
     CommentaireContainerComponent,
-    CommentaireComponent
+    CommentaireComponent,
+    PaginationComponent
   ],
     imports: [
         BrowserModule,
