@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnChanges, OnInit} from '@angular/core';
 import {MessageService} from "../message.service";
 import {Message} from "../../models/message.model";
 
@@ -23,22 +23,15 @@ export class MessageContainerComponent implements OnInit{
   constructor(private messageService: MessageService) {}
 
   ngOnInit() {
-    this.messageService.getMessages().subscribe((messages) => {
-      for (let message of messages) {
-        this.messages.push(this.initialisation(message))
-      }
+    this.messageService.getMessages();
+    this.messageService.getMessagesObservable().subscribe(messages => {
+      this.messages = messages;
       this.messagesShowed = this.setIndex(this.messages);
       this.totalPages = Math.ceil(this.messages.length / this.messagesPerPage);
 
       this.uniqueOwners = Array.from(new Set(messages.flatMap(message => message.createdBy)));
       this.uniqueHashtags = Array.from(new Set(messages.flatMap(message => message.hashtags)));
-
-      console.log(this.uniqueOwners)
     })
-  }
-
-  initialisation(message: Message) {
-    return { ...this.defaultMessage, ...message };
   }
 
   setIndex(messages: Message[]) {

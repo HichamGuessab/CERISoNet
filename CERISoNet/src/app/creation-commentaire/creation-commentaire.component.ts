@@ -23,7 +23,6 @@ export class CreationCommentaireComponent implements OnInit{
   }
 
   submitComment() {
-    console.log(this.id);
     this.commentService.postComment(this.messageId, this.commentText, this.id);
   }
 }
