@@ -14,6 +14,7 @@ export class MessageContainerComponent implements OnInit{
   currentPage: number = 1;
   totalMessages: number;
   totalPages: number;
+  sortBy: 'owner' | 'date' | 'popularity' = 'date';
 
   constructor(private messageService: MessageService) {}
 
@@ -53,5 +54,26 @@ export class MessageContainerComponent implements OnInit{
 
   hasNextPage() {
     return this.currentPage < this.totalPages;
+  }
+
+  changeSortBy(criteria: 'owner' | 'date' | 'popularity') {
+    this.sortBy = criteria;
+    this.sortMessages();
+  }
+
+  sortMessages() {
+    if (this.sortBy === 'owner') {
+      this.messages.sort((a, b) => a.createdBy - b.createdBy);
+    } else if (this.sortBy === 'date') {
+      this.messages.sort((a, b) => {
+        const dateA = new Date(a.date + ' ' + a.hour);
+        const dateB = new Date(b.date + ' ' + b.hour);
+        return dateA.getTime() - dateB.getTime();
+      });
+    } else if (this.sortBy === 'popularity') {
+      this.messages.sort((a, b) => b.likes - a.likes);
+    }
+
+    this.messagesShowed = this.setIndex(this.messages);
   }
 }
