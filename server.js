@@ -5,6 +5,7 @@ const pgClient = require('pg');
 const bodyParser = require('body-parser');
 const sha1 = require('js-sha1');
 const path = require('path');
+const dateFormat = require('date-format');
 
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session)
@@ -156,6 +157,7 @@ app.get('/checkConnexion', (req, res) => {
 })
 
 const { client, dbName } = require('./mongodb.config.js');
+const { ObjectID } = require('mongodb')
 
 app.get('/messages', async (req, res) => {
   try {
@@ -171,3 +173,42 @@ app.get('/messages', async (req, res) => {
     client.close();
   }
 })
+
+app.post('/messages/:messageId/comment', async (req, res) => {
+  const param1 = req.params['messageId'];
+  const { text, commentedBy } = req.body;
+
+  const messageId = +param1;
+
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('CERISoNet');
+
+    const commentaire = {
+      commentedBy,
+      text,
+      date: dateFormat('yyyy-MM-dd', new Date()),
+      hour: dateFormat('hh:mm', new Date())
+    };
+
+    const filter = { _id: messageId };
+    const update = {
+      $push: { comments: commentaire },
+    };
+
+    const result = await collection.updateOne(filter, update);
+    console.log(result.modifiedCount);
+
+    if (result.modifiedCount === 1) {
+      res.status(201).json(commentaire);
+    } else {
+      res.status(404).json({ error: 'Message introuvable.' });
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout du commentaire :', error);
+    res.status(500).json({ error: 'Erreur lors de l\'ajout du commentaire.' });
+  } finally {
+    client.close();
+  }
+});
