@@ -34,7 +34,7 @@
     <p class="btn btn-sm btn-dark text-white col-1">
       <small>Liker ({{ message.likes }})</small>
     </p>
-    <p class="btn btn-sm btn-dark text-white col-1">
+    <p class="btn btn-sm btn-dark text-white col-1" (click)="openForm = !openForm">
       <small>Commenter</small>
     </p>
     <p class="btn btn-sm btn-dark text-white col-1">
@@ -43,5 +43,7 @@
   </div>
 </div>
 <app-commentaire-container
+  [messageId]="message._id"
+  [openForm]="openForm"
   [commentaires]="message.comments">
 </app-commentaire-container>

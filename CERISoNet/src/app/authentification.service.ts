@@ -11,6 +11,7 @@ export class AuthentificationService {
   lastConnexionSubject = new BehaviorSubject<string>("");
   lastConnexion: string = "";
   nowConnexion: string = "";
+  idSubject = new BehaviorSubject<number>(0);
 
   constructor(
     private http: HttpClient,
@@ -20,9 +21,10 @@ export class AuthentificationService {
   }
 
   checkConnexion() {
-    this.http.get<{ isConnected: boolean }>('/checkConnexion').subscribe({
+    this.http.get<{ isConnected: boolean, identifiantPGSQL: number }>('/checkConnexion').subscribe({
       next: response => {
         this.isConnectedSubject.next(response.isConnected);
+        this.idSubject.next(response.identifiantPGSQL)
       },
       error: error => {
         return error.message;
@@ -33,7 +35,7 @@ export class AuthentificationService {
   connexion(formData: any) {
     console.log("Appel à la connexion : ")
     // On indique absolument que l'objet possède un objet message de type string pour pouvoir l'utiliser.
-    this.http.post<{ message: string }>('/login', formData).subscribe({
+    this.http.post<{ message: string, id: number }>('/login', formData).subscribe({
       next: response => {
         this.checkConnexion();
         this.notificationService.publish(response.message)
@@ -42,6 +44,7 @@ export class AuthentificationService {
         this.lastConnexionSubject.next(this.lastConnexion);
         localStorage.setItem('lastConnexion', this.nowConnexion);
         this.lastConnexion = this.nowConnexion;
+        this.idSubject.next(response.id);
       },
       error: (error: any) => {
         this.checkConnexion();
@@ -58,6 +61,7 @@ export class AuthentificationService {
       next: response => {
         this.checkConnexion();
         this.notificationService.publish(response.message)
+        this.idSubject.next(null);
       },
       error: (error: any) => {
         this.checkConnexion();
@@ -73,5 +77,9 @@ export class AuthentificationService {
 
   getIsConnectedObservable(): Observable<boolean> {
     return this.isConnectedSubject.asObservable();
+  }
+
+  getIdSubject(): Observable<number> {
+    return this.idSubject.asObservable();
   }
 }

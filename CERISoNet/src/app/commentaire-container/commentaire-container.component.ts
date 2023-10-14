@@ -7,4 +7,6 @@ import {Commentaire} from "../../models/commentaire.model";
 })
 export class CommentaireContainerComponent {
   @Input() commentaires: Commentaire[];
+  @Input() openForm: boolean = true;
+  @Input() messageId: number;
 }

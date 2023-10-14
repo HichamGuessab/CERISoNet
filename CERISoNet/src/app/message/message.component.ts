@@ -1,5 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {MessageService} from "../message.service";
+import {Component, Input, OnInit, Output} from '@angular/core';
 import {Message} from "../../models/message.model";
 
 @Component({
@@ -8,4 +7,5 @@ import {Message} from "../../models/message.model";
 })
 export class MessageComponent {
   @Input() message: Message;
+  openForm: boolean = false;
 }

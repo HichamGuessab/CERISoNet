@@ -42,7 +42,6 @@ app.use(session({
   cookie : {maxAge : 24 * 3600 * 1000} // millisecond valeur par défaut
 }));
 
-
 // Accueil
 app.get('/', (req, res) => {
   const indexPath = path.join(__dirname, 'index.html');
@@ -53,19 +52,21 @@ app.get('/', (req, res) => {
 app.post('/login', (req, res) => {
   const identifiant = req.body.identifiant;
   const motdepasse = sha1(req.body.mot_de_passe);
+  let id = 0;
 
   let sql = "select * from fredouil.users where identifiant='" + identifiant + "';";
 
   const connexionObj = new pgClient.Pool({user:'uapv2102872', host:'127.0.0.1', database:'etd', password: 'jhFP6M', port:5432});
+  let message = "";
 
   connexionObj.connect((err, client, done) => {
     if(err) {
       console.log('Erreur de connexion au serveur pg.');
-      message = 'Erreur de connexion au serveur pg.';
+      message += 'Erreur de connexion au serveur pg.';
       res.status(401).send({ message: message });
     } else {
       console.log('Connexion établie / pg db server');
-      message = 'Connexion établie / pg db server';
+      message += 'Connexion établie / pg db server';
 
       // Query send to BDD PGSQL
       client.query(sql, (err, result) => {
@@ -77,6 +78,9 @@ app.post('/login', (req, res) => {
         else if ((result.rows[0] != null) && (result.rows[0].motpasse == motdepasse)) {
           req.session.isConnected = true;
           req.session.identifiant = identifiant;
+          id = result.rows[0].id;
+          req.session.identifiantPGSQL = id;
+          console.log(req.session)
 
           message = 'Connexion réussie : Bonjour '+ result.rows[0].prenom;
 
@@ -92,7 +96,7 @@ app.post('/login', (req, res) => {
             } else {
               console.log('Statut de connexion mis à jour dans la base de données.');
               message += 'Statut de connexion mis à jour dans la base de données.';
-              res.send({ message: message });
+              res.send({ message: message, id: id });
             }
           });
         }
@@ -150,14 +154,13 @@ app.get('/logout', (req, res) => {
 
 app.get('/checkConnexion', (req, res) => {
   if(req.session.isConnected) {
-    res.send( { isConnected : true } )
+    res.send( { isConnected : true, identifiantPGSQL : req.session.identifiantPGSQL } )
   } else {
-    res.send( { isConnected : false } )
+    res.send( { isConnected : false, identifiantPGSQL : null } )
   }
 })
 
 const { client, dbName } = require('./mongodb.config.js');
-const { ObjectID } = require('mongodb')
 
 app.get('/messages', async (req, res) => {
   try {
@@ -180,6 +183,10 @@ app.post('/messages/:messageId/comment', async (req, res) => {
 
   const messageId = +param1;
 
+  console.log("MessageId : ", messageId);
+  console.log("text : ", text);
+  console.log("commentedBy : ", commentedBy);
+
   try {
     await client.connect();
     const db = client.db(dbName);
@@ -201,14 +208,12 @@ app.post('/messages/:messageId/comment', async (req, res) => {
     console.log(result.modifiedCount);
 
     if (result.modifiedCount === 1) {
-      res.status(201).json(commentaire);
+      res.status(201).json( {message: "Commentaire ajouté avec succès!"});
     } else {
       res.status(404).json({ error: 'Message introuvable.' });
     }
   } catch (error) {
     console.error('Erreur lors de l\'ajout du commentaire :', error);
     res.status(500).json({ error: 'Erreur lors de l\'ajout du commentaire.' });
-  } finally {
-    client.close();
   }
 });

@@ -1,3 +1,7 @@
+<app-creation-commentaire
+  *ngIf="openForm"
+  [messageId]="messageId">
+</app-creation-commentaire>
 <app-commentaire
   *ngFor="let commentaire of commentaires"
   [commentaire]="commentaire">
