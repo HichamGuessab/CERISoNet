@@ -1,5 +1,4 @@
-<div class="container col-10">
-  <div class="row justify-content-center my-2 bg-light border-black">
+<div class="row justify-content-center my-2 bg-light border-black">
     <!-- Pagination -->
     <div class="pagination col-auto my-1">
       <button class="btn btn-sm btn-outline-dark" (click)="previousPage()"
@@ -29,20 +28,20 @@
         <option class="dropdown-item" *ngFor="let hashtag of uniqueHashtags" [ngValue]="hashtag">{{ hashtag }}</option>
       </select>
     </div>
-  </div>
-  <app-message
-    *ngFor="let message of messagesShowed"
-    [message]="message">
-  </app-message>
-  <div class="row justify-content-center my-2">
-    <ul class="pagination col-auto">
-      <button class="btn btn-sm btn-outline-dark" (click)="previousPage()"
-              [disabled]="currentPage === 1">Précédent
-      </button>
-      <span class="badge bg-secondary justify-content-center pt-2">Page {{ currentPage }}</span>
-      <button class="btn btn-sm btn-outline-dark" (click)="nextPage()"
-              [disabled]="!hasNextPage()">Suivant
-      </button>
-    </ul>
-  </div>
+</div>
+
+<app-message
+  *ngFor="let message of messagesShowed"
+  [message]="message">
+</app-message>
+<div class="row justify-content-center my-2">
+  <ul class="pagination col-auto">
+    <button class="btn btn-sm btn-outline-dark" (click)="previousPage()"
+            [disabled]="currentPage === 1">Précédent
+    </button>
+    <span class="badge bg-secondary justify-content-center pt-2">Page {{ currentPage }}</span>
+    <button class="btn btn-sm btn-outline-dark" (click)="nextPage()"
+            [disabled]="!hasNextPage()">Suivant
+    </button>
+  </ul>
 </div>

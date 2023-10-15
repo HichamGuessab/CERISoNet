@@ -7,6 +7,7 @@ import {WebsocketService} from "../websocket.service";
 })
 export class UsersConnectedComponent implements OnInit {
   messages: string[] = [];
+  loading: boolean = true;
 
   constructor(private socketService: WebsocketService) {}
 
@@ -25,6 +26,7 @@ export class UsersConnectedComponent implements OnInit {
             this.messages.push(user);
           }
         }
+        this.loading = false;
       }
     });
   }

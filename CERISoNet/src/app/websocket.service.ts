@@ -10,17 +10,17 @@ export class WebsocketService {
   socket$: WebSocketSubject<any> = webSocket(this.backendUrl);
 
   constructor() {
-    this.socket$.subscribe({
-    next: (message) => {
-      console.log('Message reçu du serveur WebSocket :', message);
-    },
-    error: (error) => {
-      console.error('Erreur de connexion WebSocket :', error);
-    },
-    complete: () => {
-        console.log('Connexion WebSocket fermée.');
-      }
-    });
+    // this.socket$.subscribe({
+    // next: (message) => {
+    //   console.log('Message reçu du serveur WebSocket :', message);
+    // },
+    // error: (error) => {
+    //   console.error('Erreur de connexion WebSocket :', error);
+    // },
+    // complete: () => {
+    //     console.log('Connexion WebSocket fermée.');
+    //   }
+    // });
   }
 
   getWebSocketObservable() : Observable<any> {

@@ -1,6 +1,19 @@
-<div>
-  <h2>Messages WebSocket</h2>
-  <ul>
-    <li *ngFor="let message of messages">{{ message }}</li>
+<div class="dropdown">
+  <button class="btn btn-outline-light dropdown-toggle"
+          type="button"
+          id="dropdownMenuButton1"
+          data-bs-toggle="dropdown"
+          aria-expanded="false">
+    Utilisateurs connectés
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+    <li *ngIf="loading"
+        class="dropdown-item">
+      Chargement...
+    </li>
+    <li *ngFor="let message of messages"
+        class="dropdown-item">
+      {{ message }}
+    </li>
   </ul>
 </div>
