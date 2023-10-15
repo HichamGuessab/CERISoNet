@@ -65,10 +65,28 @@ export class MessageContainerComponent implements OnInit{
       this.sortBy = criteria;
       this.isSortAscending = true;
     }
-    this.sortMessages();
+    this.filterMessages();
   }
 
-  sortMessages() {
+  sortShowedMessages() {
+    let messagesToSort = this.messagesShowed; // Tri des messages affichés
+    if (this.sortBy === 'owner') {
+      messagesToSort.sort((a, b) => (this.isSortAscending ? a.createdBy - b.createdBy : b.createdBy - a.createdBy));
+    } else if (this.sortBy === 'date') {
+      messagesToSort.sort((a, b) => {
+        const dateA = new Date(a.date + ' ' + a.hour);
+        const dateB = new Date(b.date + ' ' + b.hour);
+        return this.isSortAscending ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+      });
+    } else if (this.sortBy === 'popularity') {
+      messagesToSort.sort((a, b) => (this.isSortAscending ? b.likes - a.likes : a.likes - b.likes));
+    }
+
+    this.messagesShowed = this.setIndex(messagesToSort);
+    this.totalPages = Math.ceil(this.messagesShowed.length / this.messagesPerPage);
+  }
+
+  sortAllMessages() {
     if (this.sortBy === 'owner') {
       // Opérateur conditionnel ternaire : condition ? result(if) : result(else)
       this.messages.sort((a, b) => (this.isSortAscending ? a.createdBy - b.createdBy : b.createdBy - a.createdBy));
@@ -98,16 +116,27 @@ export class MessageContainerComponent implements OnInit{
   }
 
   filterMessages() {
-    if (this.selectedOwner !== null) {
+    if (this.selectedOwner !== null && this.selectedHashtag !== null) {
+      this.filterByOwner(this.selectedOwner);
+      this.filterByHashtag(this.selectedHashtag);
+    } else if (this.selectedOwner !== null) {
       this.filterByOwner(this.selectedOwner);
     } else if (this.selectedHashtag !== null) {
       this.filterByHashtag(this.selectedHashtag);
     } else {
-
       // Réinitialiser les filtres pour afficher tous les messages
       this.messagesShowed = this.setIndex(this.messages);
-      this.currentPage = 1;
-      this.totalPages = Math.ceil(this.messages.length / this.messagesPerPage);
+    }
+
+    this.currentPage = 1;
+
+    this.totalPages = Math.ceil(this.messagesShowed.length / this.messagesPerPage);
+    console.log(this.totalPages);
+    if (this.sortBy) {
+      this.sortShowedMessages();
+    }
+    if(this.selectedHashtag == null && this.selectedOwner == null) {
+      this.sortAllMessages();
     }
   }
 }
