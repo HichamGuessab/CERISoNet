@@ -17,7 +17,7 @@ export class MessageContainerComponent implements OnInit{
   selectedHashtag: string | null = null;
   uniqueOwners: any[];
   uniqueHashtags: any[];
-
+  isSortAscending: boolean = true;
 
   constructor(private messageService: MessageService) {}
 
@@ -59,21 +59,27 @@ export class MessageContainerComponent implements OnInit{
   }
 
   changeSortBy(criteria: 'owner' | 'date' | 'popularity') {
-    this.sortBy = criteria;
+    if (this.sortBy === criteria) {
+      this.isSortAscending = !this.isSortAscending;
+    } else {
+      this.sortBy = criteria;
+      this.isSortAscending = true;
+    }
     this.sortMessages();
   }
 
   sortMessages() {
     if (this.sortBy === 'owner') {
-      this.messages.sort((a, b) => a.createdBy - b.createdBy);
+      // Opérateur conditionnel ternaire : condition ? result(if) : result(else)
+      this.messages.sort((a, b) => (this.isSortAscending ? a.createdBy - b.createdBy : b.createdBy - a.createdBy));
     } else if (this.sortBy === 'date') {
       this.messages.sort((a, b) => {
         const dateA = new Date(a.date + ' ' + a.hour);
         const dateB = new Date(b.date + ' ' + b.hour);
-        return dateA.getTime() - dateB.getTime();
+        return this.isSortAscending ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
       });
     } else if (this.sortBy === 'popularity') {
-      this.messages.sort((a, b) => b.likes - a.likes);
+      this.messages.sort((a, b) => (this.isSortAscending ? b.likes - a.likes : a.likes - b.likes));
     }
 
     this.messagesShowed = this.setIndex(this.messages);
