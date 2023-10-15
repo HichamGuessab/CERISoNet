@@ -56,7 +56,13 @@ app.post('/login', (req, res) => {
 
   let sql = "select * from fredouil.users where identifiant='" + identifiant + "';";
 
-  const connexionObj = new pgClient.Pool({user:'uapv2102872', host:'127.0.0.1', database:'etd', password: 'jhFP6M', port:5432});
+  const connexionObj = new pgClient.Pool({
+        user:'uapv2102872',
+        host:'127.0.0.1',
+        database:'etd',
+        password: 'jhFP6M',
+        port:5432
+      });
   let message = "";
 
   connexionObj.connect((err, client, done) => {
@@ -110,6 +116,48 @@ app.post('/login', (req, res) => {
     client.release();
   })
 })
+
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({server: server});
+
+wss.on('connection', (socket) => {
+  console.log("Un client s'est connecté.");
+})
+
+wss.on('userConnected', (socket) => {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: 'usersConnected', data: socket }));
+    }
+  });
+})
+
+setInterval(() => {
+  const connexionObj = new pgClient.Pool({
+    user:'uapv2102872',
+    host:'127.0.0.1',
+    database:'etd',
+    password: 'jhFP6M',
+    port:5432
+  });
+
+  connexionObj.connect((err, client) => {
+    if (err) {
+      console.log('Erreur de connexion au serveur pg.');
+    } else {
+      client.query('SELECT * FROM fredouil.users WHERE statut_connexion = 1', (error, results) => {
+        if (error) {
+          console.error('Erreur lors de la récupération des utilisateurs connectés:', error);
+        } else {
+          const users = results.rows;
+          const identifiants = users.map(user => user.identifiant);
+          wss.emit('userConnected', {message: identifiants});
+        }
+      });
+    }
+    client.release();
+  });
+}, 2000);
 
 // Déconnexion
 app.get('/logout', (req, res) => {

@@ -14,6 +14,7 @@ import { MessageContainerComponent } from './message-container/message-container
 import { CommentaireContainerComponent } from './commentaire-container/commentaire-container.component';
 import { CommentaireComponent } from './commentaire/commentaire.component';
 import { CreationCommentaireComponent } from './creation-commentaire/creation-commentaire.component';
+import { UsersConnectedComponent } from './users-connected/users-connected.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { CreationCommentaireComponent } from './creation-commentaire/creation-co
     MessageContainerComponent,
     CommentaireContainerComponent,
     CommentaireComponent,
-    CreationCommentaireComponent
+    CreationCommentaireComponent,
+    UsersConnectedComponent
   ],
     imports: [
         BrowserModule,
