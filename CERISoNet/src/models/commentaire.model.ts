@@ -1,5 +1,5 @@
 export class Commentaire {
-  text: string = "Aucun message.";
+  text: string;
   commentedBy: number;
   date: string;
   hour: string;

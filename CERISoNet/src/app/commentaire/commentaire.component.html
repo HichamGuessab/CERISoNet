@@ -2,12 +2,17 @@
   <div class="card-body list-group-item list-group-item-dark">
     <p class="card-text px-3 pt-2 pb-0">{{ commentaire.text }}</p>
     <div class="row py-0">
-      <p class="card-text col-9 mx-2">
+      <p class="card-text col-5 mx-2">
         <small class="text-muted">Auteur : {{ commentaire.commentedBy }}</small>
       </p>
       <p class="card-text col">
         <small class="text-muted">Le {{ commentaire.date }} à {{ commentaire.hour }}</small>
       </p>
+      <button class="btn btn-outline-dark col-2"
+              *ngIf="commentaire.commentedBy == connectedUserId"
+              (click)="deleteComment()">
+        Supprimer
+      </button>
     </div>
   </div>
 </div>

@@ -217,3 +217,70 @@ app.post('/messages/:messageId/comment', async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de l\'ajout du commentaire.' });
   }
 });
+
+const crypto = require('crypto-js');
+const encryptionKey = 'secretKey';
+
+app.delete('/messages/:messageId/:commentedBy/text/:commentText/date/:commentedDate/:commentedHour/deleteComment', async (req, res) => {
+  const messageId = +req.params.messageId;
+  const commentedBy = +req.params.commentedBy;
+  let encryptedText = req.params.commentText;
+  let commentText;
+  const commentedDate = req.params.commentedDate;
+  const commentedHour = req.params.commentedHour;
+
+  const sanitizedEncryptedText = encryptedText.replace(/SLASH_REPLACEMENT/g, '/');
+  const bytes = crypto.AES.decrypt(sanitizedEncryptedText, encryptionKey);
+  commentText = bytes.toString(crypto.enc.Utf8);
+
+  if (commentText.endsWith("?") || commentText.endsWith("&")) {
+    commentText = commentText.replace(/XYZ$/, "");
+  }
+
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('CERISoNet');
+
+    const filter = { _id: messageId };
+
+    let update;
+    let result;
+    if(commentedBy === 0 && commentText === "*^$²^s²df;²:pojn84g²1d5") {
+      console.log("Deux non renseignés.")
+      update = {
+        $pull: { comments: {  date: commentedDate, hour: commentedHour } },
+      };
+      result = await collection.updateOne(filter, update);
+    } else if(commentedBy === 0) {
+      console.log("Auteur non renseigné.")
+      update = {
+        $pull: { comments: { text: commentText, date: commentedDate, hour: commentedHour } },
+      };
+      result = await collection.updateOne(filter, update);
+    } else if(commentText === "*^$²^s²df;²:pojn84g²1d5") {
+      console.log("Texte non renseigné");
+      update = {
+        $pull: { comments: { commentedBy: commentedBy, date: commentedDate, hour: commentedHour } },
+      };
+      result = await collection.updateOne(filter, update);
+    } else {
+      console.log("Texte non renseigné");
+      update = {
+        $pull: { comments: { commentedBy: commentedBy, text: commentText, date: commentedDate, hour: commentedHour } },
+      };
+      result = await collection.updateOne(filter, update);
+    }
+
+    if (result.modifiedCount === 1) {
+      res.status(200).json({ message: 'Commentaire supprimé avec succès.' });
+    } else {
+      res.status(404).json({ message: 'Message ou commentaire introuvable.' });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la suppression du commentaire :', error);
+    res.status(500).json({ message: 'Erreur lors de la suppression du commentaire.' });
+  } finally {
+    client.close();
+  }
+});

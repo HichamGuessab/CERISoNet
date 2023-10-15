@@ -9,7 +9,7 @@ import {AuthentificationService} from "../authentification.service";
 export class CreationCommentaireComponent implements OnInit{
   commentText: string = '';
   @Input() messageId;
-  id : number;
+  connectedUserId : number;
 
   constructor(
     private commentService: CommentService,
@@ -17,12 +17,11 @@ export class CreationCommentaireComponent implements OnInit{
 
   ngOnInit(): void {
     this.authentificationService.getIdSubject().subscribe( (id) => {
-        this.id = id;
-      }
-    )
+        this.connectedUserId = id;
+    })
   }
 
   submitComment() {
-    this.commentService.postComment(this.messageId, this.commentText, this.id);
+    this.commentService.postComment(this.messageId, this.commentText, this.connectedUserId);
   }
 }

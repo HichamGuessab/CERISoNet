@@ -9,7 +9,6 @@ import {Message} from "../../models/message.model";
 export class MessageContainerComponent implements OnInit{
   messages: Message[] = [];
   messagesShowed: Message[] = [];
-  defaultMessage: Message = new Message();
   messagesPerPage: number = 4;
   currentPage: number = 1;
   totalPages: number;
