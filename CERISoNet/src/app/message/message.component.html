@@ -3,12 +3,12 @@
 
   <!-- Body -->
   <div class="row mx-2">
-    <div class="card-body col-9">
+    <div class="card-body col-lg-9 col-md-8">
       <p class="card-text"> {{ message.body}}</p>
     </div>
 
     <!-- Image -->
-    <div class="card-body col-3">
+    <div class="card-body col-lg-3 col-md-4">
       <img class="card-img" [src]="message.images.url" alt="">
       <h6 class="card-text pt-2 px-3">{{ message.images.title }}</h6>
     </div>
@@ -25,19 +25,19 @@
 
   <!-- Footer -->
   <div class="row mx-2">
-    <p class="card-text col-2">
+    <p class="card-text col-xl-2 col-lg-2 col-md-2 col-sm-12">
       <small>Auteur : {{ message.createdBy }}</small>
     </p>
-    <p class="card-text col">
+    <p class="card-text col-xl-7 col-lg-4 col-md-4">
       <small>Le {{ message.date }} à {{ message.hour }}</small>
     </p>
-    <p class="btn btn-sm btn-dark text-white col-1">
+    <p class="btn btn-sm btn-dark text-white col-xl-1 col-lg-2 col-md-2">
       <small>Liker ({{ message.likes }})</small>
     </p>
-    <p class="btn btn-sm btn-dark text-white col-1" (click)="openForm = !openForm">
+    <p class="btn btn-sm btn-dark text-white col-xl-1 col-lg-2 col-md-2" (click)="openForm = !openForm">
       <small>Commenter</small>
     </p>
-    <p class="btn btn-sm btn-dark text-white col-1">
+    <p class="btn btn-sm btn-dark text-white col-xl-1 col-lg-2 col-md-2">
       <small>Partager ({{ message.shared }})</small>
     </p>
   </div>
