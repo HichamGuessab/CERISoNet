@@ -1,0 +1,56 @@
+<div class="card list-group list-group-flush bg-secondary mt-0 pb-0 col-11 offset-1">
+  <div class="card-body">
+    <form (ngSubmit)="submitMessage()">
+      <div class="form-floating">
+        <textarea id="floatingTextarea"
+                  name="commentText"
+                  class="form-control"
+                  placeholder="Ecrivez votre message ici."
+                  [(ngModel)]="messageText" required>
+        </textarea>
+        <label for="floatingTextarea">Ecrivez votre message ici.</label>
+      </div>
+      <div class="row">
+        <p class="lead col-12 mt-2">Hashtags : <span *ngFor="let hashtag of hashtags">{{hashtag}} </span></p>
+        <div class="input-group mb-3 col-6">
+          <input type="text"
+                 class="form-control"
+                 placeholder="Un hashtag"
+                 [(ngModel)]="hashtag"
+                 name="hashtag">
+          <button type="button"
+                  class="btn btn-dark"
+                  (click)="addHashtag()">
+            Ajouter hashtag
+          </button>
+        </div>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="input-group mb-3 col-6">
+          <input type="text"
+                 class="form-control"
+                 placeholder="Lien de votre image"
+                 [(ngModel)]="image"
+                 name="monImage">
+        </div>
+        <div class="input-group mb-3 col-6">
+          <input type="text"
+                 class="form-control"
+                 placeholder="Titre de votre image"
+                 [(ngModel)]="imageTitle"
+                 name="monImageTitre"
+                 required>
+        </div>
+        <img class="col-3 mb-2" [src]="image">
+      </div>
+
+      <div class="row mx-1">
+        <button type="submit"
+                class="btn btn-sm btn-outline-dark align-self-end">
+          Partager
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

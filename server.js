@@ -130,8 +130,11 @@ wss.on('connection', (socket) => {
     const jsonData = JSON.parse(dataString);
 
     if(jsonData.event === "likedMessage"){
-      console.log("Recu : ", jsonData);
       wss.emit('likedMessage', jsonData);
+    }
+    if(jsonData.event === "shareMessage"){
+      console.log("Recu : ", jsonData);
+      wss.emit('shareMessage', jsonData)
       console.log("Je suis sortie");
     }
   })
@@ -146,8 +149,6 @@ wss.on('userConnected', (socket) => {
 })
 
 wss.on('likedMessage', async (data) => {
-  console.log("yes je rentre");
-  console.log(data); // Soucis ici
   const messageId = data.messageId;
   const like = data.like;
   const db = client.db(dbName);
@@ -178,6 +179,57 @@ wss.on('likedMessage', async (data) => {
     console.error('Erreur lors de la mise à jour du like', error);
   }
 });
+
+wss.on('shareMessage', async (data) => {
+  console.log("yes je rentre");
+
+  console.log(data);
+
+  const newPost = {
+    date : dateFormat('yyyy-MM-dd', new Date()),
+    hour : dateFormat('hh:mm', new Date()),
+    createdBy : data.message.createdBy,
+    images: data.message.images,
+    likes : data.message.likes,
+    hashtags: data.message.hashtags,
+    body : data.message.body,
+    comments : data.message.comments,
+    shared : data.message.shared
+  }
+
+  console.log(newPost);
+
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('CERISoNet');
+
+    // Recherche du plus grand "_id" pour incrémenter dessus
+    const lastPost = await collection
+        .find({ _id: { $type: 'number' } })
+        .sort({ _id: -1 })
+        .limit(1)
+        .toArray();
+    let maxId = 1;
+
+    if (lastPost.length > 0) {
+      maxId = lastPost[0]._id + 1;
+    }
+    console.log(maxId);
+    newPost._id = maxId;
+    console.log(newPost);
+
+    const result = await collection.insertOne(newPost);
+
+    if (result.insertedCount === 1) {
+      console.log("Message partagé posté avec succès.")
+      wss.emit('messagePosted', {
+        message : "Vous avez posté un message partagé."
+      });
+    }
+  } catch (error) {
+    console.error('Erreur lors du partage du message :', error);
+  }
+})
 
 setInterval(() => {
   const connexionObj = new pgClient.Pool({

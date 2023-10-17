@@ -1,6 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Message} from "../../models/message.model";
-import {AuthentificationService} from "../authentification.service";
 
 @Component({
   selector: 'app-message',
@@ -9,6 +8,7 @@ import {AuthentificationService} from "../authentification.service";
 export class MessageComponent {
   @Input() message: Message;
   openForm: boolean = false;
+  openShareMessageForm: boolean = false;
   liked: boolean = true;
   @Input() isConnected: boolean;
 

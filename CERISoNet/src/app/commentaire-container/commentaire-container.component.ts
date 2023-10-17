@@ -9,4 +9,5 @@ export class CommentaireContainerComponent {
   @Input() commentaires: Commentaire[];
   @Input() openForm: boolean = true;
   @Input() messageId: number;
+  @Input() openShareMessageForm: boolean;
 }

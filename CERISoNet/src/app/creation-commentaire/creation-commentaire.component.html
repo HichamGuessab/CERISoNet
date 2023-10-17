@@ -1,6 +1,6 @@
 <div class="card list-group list-group-flush bg-secondary mt-0 pb-0 col-11 offset-1">
   <div class="card-body">
-    <form (ngSubmit)="submitComment()" #commentForm="ngForm">
+    <form (ngSubmit)="submitComment()">
       <div class="form-floating">
         <textarea id="floatingTextarea"
                   name="commentText"
@@ -8,12 +8,12 @@
                   placeholder="Ecrivez votre commentaire ici."
                   [(ngModel)]="commentText" required>
         </textarea>
-        <label for="floatingTextarea">Ecivez votre commentaire ici.</label>
+        <label for="floatingTextarea">Ecrivez votre commentaire ici.</label>
       </div>
       <div class="row mx-1">
         <button type="submit"
                 class="btn btn-sm btn-dark align-self-end">
-          Poster un commentaire
+          Commenter
         </button>
       </div>
     </form>

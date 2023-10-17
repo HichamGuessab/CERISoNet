@@ -15,6 +15,8 @@ import { CommentaireContainerComponent } from './commentaire-container/commentai
 import { CommentaireComponent } from './commentaire/commentaire.component';
 import { CreationCommentaireComponent } from './creation-commentaire/creation-commentaire.component';
 import { UsersConnectedComponent } from './users-connected/users-connected.component';
+import { ShareMessageComponent } from './share-message/share-message.component';
+import {NgOptimizedImage} from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -27,13 +29,15 @@ import { UsersConnectedComponent } from './users-connected/users-connected.compo
     CommentaireContainerComponent,
     CommentaireComponent,
     CreationCommentaireComponent,
-    UsersConnectedComponent
+    UsersConnectedComponent,
+    ShareMessageComponent
   ],
     imports: [
         BrowserModule,
         AppRoutingModule,
         FormsModule,
-        HttpClientModule
+        HttpClientModule,
+        NgOptimizedImage
     ],
   providers: [AuthentificationService],
   bootstrap: [AppComponent]
