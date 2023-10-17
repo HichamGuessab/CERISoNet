@@ -43,6 +43,8 @@ app.use(session({
   cookie : {maxAge : 24 * 3600 * 1000} // millisecond valeur par défaut
 }));
 
+client.connect();
+
 // Accueil
 app.get('/', (req, res) => {
   const indexPath = path.join(__dirname, 'index.html');
@@ -148,7 +150,6 @@ wss.on('likedMessage', async (data) => {
   console.log(data); // Soucis ici
   const messageId = data.messageId;
   const like = data.like;
-  await client.connect();
   const db = client.db(dbName);
   const collection = db.collection('CERISoNet');
   try {
@@ -175,8 +176,6 @@ wss.on('likedMessage', async (data) => {
     }
   } catch (error) {
     console.error('Erreur lors de la mise à jour du like', error);
-  } finally {
-    client.close();
   }
 });
 
@@ -258,7 +257,6 @@ app.get('/checkConnexion', (req, res) => {
 
 app.get('/messages', async (req, res) => {
   try {
-    await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('CERISoNet');
     const messages = await collection.find({}).toArray();
@@ -266,8 +264,6 @@ app.get('/messages', async (req, res) => {
   } catch (err) {
     console.error('Erreur lors de la récupération des messages :', err);
     res.status(500).json({message: 'Erreur lors de la récupération des messages.'})
-  } finally {
-    client.close();
   }
 })
 
@@ -282,7 +278,6 @@ app.post('/messages/:messageId/comment', async (req, res) => {
   console.log("commentedBy : ", commentedBy);
 
   try {
-    await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('CERISoNet');
 
@@ -332,7 +327,6 @@ app.delete('/messages/:messageId/:commentedBy/text/:commentText/date/:commentedD
   }
 
   try {
-    await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('CERISoNet');
 
@@ -374,8 +368,6 @@ app.delete('/messages/:messageId/:commentedBy/text/:commentText/date/:commentedD
   } catch (error) {
     console.error('Erreur lors de la suppression du commentaire :', error);
     res.status(500).json({ message: 'Erreur lors de la suppression du commentaire.' });
-  } finally {
-    client.close();
   }
 });
 
