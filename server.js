@@ -9,6 +9,7 @@ const dateFormat = require('date-format');
 
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session)
+const { client, dbName } = require('./mongodb.config.js');
 
 const app = express(); // appel à expressJS
 const port = 3201; // port définit
@@ -122,6 +123,16 @@ const wss = new WebSocket.Server({server: server});
 
 wss.on('connection', (socket) => {
   console.log("Un client s'est connecté.");
+  socket.on('message', (data) => {
+    const dataString = data.toString();
+    const jsonData = JSON.parse(dataString);
+
+    if(jsonData.event === "likedMessage"){
+      console.log("Recu : ", jsonData);
+      wss.emit('likedMessage', jsonData);
+      console.log("Je suis sortie");
+    }
+  })
 })
 
 wss.on('userConnected', (socket) => {
@@ -131,6 +142,43 @@ wss.on('userConnected', (socket) => {
     }
   });
 })
+
+wss.on('likedMessage', async (data) => {
+  console.log("yes je rentre");
+  console.log(data); // Soucis ici
+  const messageId = data.messageId;
+  const like = data.like;
+  await client.connect();
+  const db = client.db(dbName);
+  const collection = db.collection('CERISoNet');
+  try {
+    const query = { _id: messageId };
+    let update = {};
+    if(like) {
+      update = { $inc: { likes: 1 } }; // Incrémentation du nombre de likes
+    } else {
+      update = { $inc: { likes: -1 } }; // Décrémentation du nombre de likes
+    }
+    console.log(update);
+    const result = await collection.updateOne(query, update);
+    console.log(result);
+    if (result.matchedCount === 1) {
+      const updatedMessage = await collection.findOne(query);
+
+      // Envoie de la mise à jour aux clients connectés
+      wss.emit('messageLiked', {
+        message : "Vous avez liké un message.",
+        messageId: updatedMessage._id,
+        nbLikes: updatedMessage.likes,
+      });
+      console.log(updatedMessage.likes)
+    }
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du like', error);
+  } finally {
+    client.close();
+  }
+});
 
 setInterval(() => {
   const connexionObj = new pgClient.Pool({
@@ -207,8 +255,6 @@ app.get('/checkConnexion', (req, res) => {
     res.send( { isConnected : false, identifiantPGSQL : null } )
   }
 })
-
-const { client, dbName } = require('./mongodb.config.js');
 
 app.get('/messages', async (req, res) => {
   try {
@@ -332,3 +378,4 @@ app.delete('/messages/:messageId/:commentedBy/text/:commentText/date/:commentedD
     client.close();
   }
 });
+

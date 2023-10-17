@@ -1,6 +1,8 @@
 import {Component, OnChanges, OnInit} from '@angular/core';
 import {MessageService} from "../message.service";
 import {Message} from "../../models/message.model";
+import {WebsocketService} from "../websocket.service";
+import {AuthentificationService} from "../authentification.service";
 
 @Component({
   selector: 'app-message-container',
@@ -18,10 +20,18 @@ export class MessageContainerComponent implements OnInit{
   uniqueOwners: any[];
   uniqueHashtags: any[];
   isSortAscending: boolean = true;
+  messagesLikesByUser: { [userId: number]: number[] } = {};
+  connectedUserId : number;
 
-  constructor(private messageService: MessageService) {}
+  constructor(
+    private messageService: MessageService,
+    private webSocketService: WebsocketService,
+    private authentificationService: AuthentificationService) {}
 
   ngOnInit() {
+    this.authentificationService.getIdSubject().subscribe( connectedUserId => {
+      this.connectedUserId = connectedUserId;
+    })
     this.messageService.getMessages();
     this.messageService.getMessagesObservable().subscribe(messages => {
       this.messages = messages;
@@ -30,6 +40,14 @@ export class MessageContainerComponent implements OnInit{
 
       this.uniqueOwners = Array.from(new Set(messages.flatMap(message => message.createdBy)));
       this.uniqueHashtags = Array.from(new Set(messages.flatMap(message => message.hashtags)));
+    })
+    this.webSocketService.getWebSocketObservable().subscribe((webSocket) => {
+      if(webSocket.type === "messageLiked") {
+        const updatedMessage = this.messages.find((msg) => msg._id === webSocket.messageId);
+        if (updatedMessage) {
+          updatedMessage.likes = webSocket.nbLikes;
+        }
+      }
     })
   }
 
@@ -138,5 +156,39 @@ export class MessageContainerComponent implements OnInit{
     if(this.selectedHashtag == null && this.selectedOwner == null) {
       this.sortAllMessages();
     }
+  }
+
+  likeMessage(messageId: number) {
+    console.log("Dedans")
+    console.log()
+    const userId = this.connectedUserId;
+
+    if (!this.messagesLikesByUser[userId]) {
+      this.messagesLikesByUser[userId] = [];
+    }
+
+    let exist: boolean = this.messagesLikesByUser[userId].includes(messageId);
+    console.log(exist)
+    console.log(this.messagesLikesByUser);
+    if (!exist) {
+      this.messagesLikesByUser[userId].push(messageId);
+      console.log("On va liker")
+      console.log(this.messagesLikesByUser);
+    } else {
+      console.log("On va disliker")
+      console.log(this.messagesLikesByUser);
+      const index = this.messagesLikesByUser[userId].indexOf(messageId);
+      if (index !== -1) {
+        this.messagesLikesByUser[userId].splice(index, 1);
+      }
+      console.log(this.messagesLikesByUser);
+    }
+
+    this.webSocketService.sendMessage({
+      event: "likedMessage",
+      messageId: messageId,
+      like : !exist
+    });
+    this.messageService.getMessages();
   }
 }

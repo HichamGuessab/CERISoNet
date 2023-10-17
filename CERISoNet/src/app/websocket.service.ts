@@ -23,6 +23,11 @@ export class WebsocketService {
     // });
   }
 
+  sendMessage(data: any) {
+    console.log(data.messageId + " " + data.like);
+    this.socket$.next(data);
+  }
+
   getWebSocketObservable() : Observable<any> {
     return this.socket$;
   }
