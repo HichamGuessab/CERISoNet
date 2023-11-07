@@ -24,7 +24,7 @@ export class AuthentificationService {
     this.http.get<{ isConnected: boolean, identifiantPGSQL: number }>('/checkConnexion').subscribe({
       next: response => {
         this.isConnectedSubject.next(response.isConnected);
-        this.idSubject.next(response.identifiantPGSQL)
+        this.idSubject.next(response.identifiantPGSQL);
       },
       error: error => {
         return error.message;
@@ -38,7 +38,7 @@ export class AuthentificationService {
     this.http.post<{ message: string, id: number }>('/login', formData).subscribe({
       next: response => {
         this.checkConnexion();
-        this.notificationService.publish(response.message)
+        this.notificationService.publish(response.message + "." + "\nDernière connexion le " + localStorage.getItem('lastConnexion'));
         this.nowConnexion = new Date().toLocaleString();
         this.lastConnexion = localStorage.getItem('lastConnexion');
         this.lastConnexionSubject.next(this.lastConnexion);

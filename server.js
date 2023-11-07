@@ -104,7 +104,6 @@ app.post('/login', (req, res) => {
               res.status(401).send({ message: message });
             } else {
               console.log('Statut de connexion mis à jour dans la base de données.');
-              message += 'Statut de connexion mis à jour dans la base de données.';
               res.send({ message: message, id: id });
             }
           });
