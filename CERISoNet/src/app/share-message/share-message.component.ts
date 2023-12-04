@@ -79,7 +79,7 @@ export class ShareMessageComponent implements OnInit{
             event: "shareMessage",
             message: newMessageData
           });
-          this.messageService.getMessages();
+          this.messageService.getMessagesFilteredAndSorted();
         } else {
           this.notificationService.publish("L'url de votre image est introuvable.")
         }

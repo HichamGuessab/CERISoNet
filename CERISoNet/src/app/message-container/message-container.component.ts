@@ -15,7 +15,7 @@ export class MessageContainerComponent implements OnInit{
   messagesPerPage: number = 4;
   currentPage: number = 1;
   totalPages: number;
-  sortBy: 'owner' | 'date' | 'popularity' = 'date';
+  sortBy: 'createdBy' | 'date' | 'likes' = 'date';
   selectedOwner: number | null = null;
   selectedHashtag: string | null = null;
   uniqueOwners: any[];
@@ -35,10 +35,13 @@ export class MessageContainerComponent implements OnInit{
     this.authentificationService.getIdSubject().subscribe( connectedUserId => {
       this.connectedUserId = connectedUserId;
     })
+
     this.authentificationService.getIsConnectedObservable().subscribe( isConnected => {
       this.isConnected = isConnected;
     })
-    this.messageService.getMessages();
+
+    this.messageService.getMessagesFilteredAndSorted();
+
     this.messageService.getMessagesObservable().subscribe(messages => {
       this.messages = messages;
       this.messagesShowed = this.setIndex(this.messages);
@@ -47,6 +50,7 @@ export class MessageContainerComponent implements OnInit{
       this.uniqueOwners = Array.from(new Set(messages.flatMap(message => message.createdBy)));
       this.uniqueHashtags = Array.from(new Set(messages.flatMap(message => message.hashtags)));
     })
+
     this.webSocketService.getWebSocketObservable().subscribe((webSocket) => {
       if(webSocket.type === "messageLiked") {
         const updatedMessage = this.messages.find((msg) => msg._id === webSocket.messageId);
@@ -82,86 +86,24 @@ export class MessageContainerComponent implements OnInit{
     return this.currentPage < this.totalPages;
   }
 
-  changeSortBy(criteria: 'owner' | 'date' | 'popularity') {
+  changeSortBy(criteria: 'createdBy' | 'date' | 'likes') {
     if (this.sortBy === criteria) {
       this.isSortAscending = !this.isSortAscending;
     } else {
       this.sortBy = criteria;
+      this.messageService.sorting$.next(criteria);
       this.isSortAscending = true;
     }
     this.filterMessages();
   }
 
-  sortShowedMessages() {
-    let messagesToSort = this.messagesShowed; // Tri des messages affichés
-    if (this.sortBy === 'owner') {
-      messagesToSort.sort((a, b) => (this.isSortAscending ? a.createdBy - b.createdBy : b.createdBy - a.createdBy));
-    } else if (this.sortBy === 'date') {
-      messagesToSort.sort((a, b) => {
-        const dateA = new Date(a.date + ' ' + a.hour);
-        const dateB = new Date(b.date + ' ' + b.hour);
-        return this.isSortAscending ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
-      });
-    } else if (this.sortBy === 'popularity') {
-      messagesToSort.sort((a, b) => (this.isSortAscending ? b.likes - a.likes : a.likes - b.likes));
-    }
-
-    this.messagesShowed = this.setIndex(messagesToSort);
-    this.totalPages = Math.ceil(this.messagesShowed.length / this.messagesPerPage);
-  }
-
-  sortAllMessages() {
-    if (this.sortBy === 'owner') {
-      // Opérateur conditionnel ternaire : condition ? result(if) : result(else)
-      this.messages.sort((a, b) => (this.isSortAscending ? a.createdBy - b.createdBy : b.createdBy - a.createdBy));
-    } else if (this.sortBy === 'date') {
-      this.messages.sort((a, b) => {
-        const dateA = new Date(a.date + ' ' + a.hour);
-        const dateB = new Date(b.date + ' ' + b.hour);
-        return this.isSortAscending ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
-      });
-    } else if (this.sortBy === 'popularity') {
-      this.messages.sort((a, b) => (this.isSortAscending ? b.likes - a.likes : a.likes - b.likes));
-    }
-
-    this.messagesShowed = this.setIndex(this.messages);
-  }
-
-  filterByOwner(ownerId: number) {
-    this.messagesShowed = this.messages.filter(message => message.createdBy === ownerId);
-    this.currentPage = 1;
-    this.totalPages = Math.ceil(this.messagesShowed.length / this.messagesPerPage);
-  }
-
-  filterByHashtag(hashtag: string) {
-    this.messagesShowed = this.messages.filter(message => message.hashtags.includes(hashtag));
-    this.currentPage = 1;
-    this.totalPages = Math.ceil(this.messagesShowed.length / this.messagesPerPage);
-  }
-
   filterMessages() {
-    if (this.selectedOwner !== null && this.selectedHashtag !== null) {
-      this.filterByOwner(this.selectedOwner);
-      this.filterByHashtag(this.selectedHashtag);
-    } else if (this.selectedOwner !== null) {
-      this.filterByOwner(this.selectedOwner);
-    } else if (this.selectedHashtag !== null) {
-      this.filterByHashtag(this.selectedHashtag);
-    } else {
-      // Réinitialiser les filtres pour afficher tous les messages
-      this.messagesShowed = this.setIndex(this.messages);
-    }
-
-    this.currentPage = 1;
-
-    this.totalPages = Math.ceil(this.messagesShowed.length / this.messagesPerPage);
-    console.log(this.totalPages);
-    if (this.sortBy) {
-      this.sortShowedMessages();
-    }
-    if(this.selectedHashtag == null && this.selectedOwner == null) {
-      this.sortAllMessages();
-    }
+    // Réinitialiser les filtres pour afficher tous les messages
+    this.messageService.owner$.next(this.selectedOwner);
+    this.messageService.hashtag$.next(this.selectedHashtag);
+    this.messageService.sortingOrder$.next(this.isSortAscending.toString())
+    this.messageService.getMessagesFilteredAndSorted();
+    this.messagesShowed = this.setIndex(this.messages);
   }
 
   likeMessage(messageId: number) {

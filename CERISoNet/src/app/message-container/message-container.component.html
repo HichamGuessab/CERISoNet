@@ -12,9 +12,9 @@
 
     <!-- Tri des messages -->
     <div class="btn-group my-1">
-      <button class="btn btn-outline-dark" (click)="changeSortBy('owner')" [class.active]="sortBy === 'owner'">Trier par Propriétaire</button>
+      <button class="btn btn-outline-dark" (click)="changeSortBy('createdBy')" [class.active]="sortBy === 'createdBy'">Trier par Propriétaire</button>
       <button class="btn btn-outline-dark" (click)="changeSortBy('date')" [class.active]="sortBy === 'date'">Trier par Date</button>
-      <button class="btn btn-outline-dark" (click)="changeSortBy('popularity')" [class.active]="sortBy === 'popularity'">Trier par Popularité</button>
+      <button class="btn btn-outline-dark" (click)="changeSortBy('likes')" [class.active]="sortBy === 'likes'">Trier par Popularité</button>
     </div>
 
     <!-- Filtrage des messages -->

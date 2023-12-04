@@ -28,7 +28,7 @@ export class CommentService {
       }).subscribe({
           next: response => {
             this.notificationService.publish(response.message);
-            this.messageService.getMessages();
+            this.messageService.getMessagesFilteredAndSorted();
           },
           error: err => {
             this.notificationService.publish(err.message);
@@ -64,7 +64,8 @@ export class CommentService {
           next: res => {
             console.log("Reussi : " + res);
             this.notificationService.publish(res.message)
-            this.messageService.getMessages();
+            console.log("COUCOU2")
+            this.messageService.getMessagesFilteredAndSorted();
           },
           error: err => {
             console.log("Erreur :" + err);

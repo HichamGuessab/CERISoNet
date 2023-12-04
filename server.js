@@ -318,6 +318,69 @@ app.get('/messages', async (req, res) => {
   }
 })
 
+// Filtrage et Tri
+app.get('/messages/:owner/:hashtag/:sorting/:sortingOrder', async (req, res) => {
+  const owner = req.params['owner'].toString();
+  const hashtag = req.params['hashtag'];
+  const sorting = req.params['sorting'];
+  const sortingOrder = req.params['sortingOrder'];
+
+  console.log(owner, hashtag, sorting, sortingOrder);
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('CERISoNet');
+
+    let messages;
+    let filterParams = {};
+
+    if(hashtag !== 'null' && hashtag !== 'undefined') {
+      console.log("hashtag " + hashtag)
+      filterParams.hashtags = {
+        $all: ['#'+hashtag]
+      };
+    }
+
+    if(owner !== 'null' && owner !== 'undefined') {
+      console.log("owner")
+      filterParams.createdBy =
+        parseInt(owner)
+      ;
+    }
+
+    console.log(filterParams)
+
+    messages = await collection.find(
+        filterParams
+    ).toArray();
+
+    console.log(messages)
+
+    if (sorting !== 'null' && sortingOrder !== 'null') {
+      console.log("sortingAndSortingOrder")
+      let sortParams = {};
+      sortParams[sorting] = sortingOrder === 'true' ? -1 : 1;
+
+      messages.sort((a, b) => {
+        const valueA = a[sorting];
+        const valueB = b[sorting];
+
+        if (valueA < valueB) {
+          return sortParams[sorting];
+        } else if (valueA > valueB) {
+          return -sortParams[sorting];
+        } else {
+          return 0;
+        }
+      });
+    }
+
+    res.json(messages);
+  } catch (err) {
+    console.error('Erreur lors de la récupération des messages filtrés :', err);
+    res.status(500).json({message: 'Erreur lors de la récupération des messages.'})
+  }
+})
+
 app.post('/messages/:messageId/comment', async (req, res) => {
   const param1 = req.params['messageId'];
   const { text, commentedBy } = req.body;
