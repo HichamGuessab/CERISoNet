@@ -7,6 +7,7 @@ import {Message} from "../../models/message.model";
 })
 export class MessageComponent {
   @Input() message: Message;
+  @Input() usersCorrespondences: any;
   openForm: boolean = false;
   openShareMessageForm: boolean = false;
   liked: boolean = true;
@@ -24,5 +25,11 @@ export class MessageComponent {
       this.liked = !this.liked;
     }
     this.likeMessageEvent.emit();
+  }
+
+  getUserCorrespondence(id: number) {
+    return (this?.usersCorrespondences.find(
+        (element) => element.id == id)
+    ).identifiant;
   }
 }

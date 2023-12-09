@@ -25,6 +25,8 @@ export class MessageContainerComponent implements OnInit{
   connectedUserId : number;
   isConnected: boolean;
 
+  usersCorrespondences: any;
+
   constructor(
     private messageService: MessageService,
     private webSocketService: WebsocketService,
@@ -32,13 +34,19 @@ export class MessageContainerComponent implements OnInit{
     private notificationService: NotificationService) {}
 
   ngOnInit() {
-    this.authentificationService.getIdSubject().subscribe( connectedUserId => {
+    this.authentificationService.getIdSubject().subscribe(connectedUserId => {
       this.connectedUserId = connectedUserId;
     })
 
-    this.authentificationService.getIsConnectedObservable().subscribe( isConnected => {
+    this.authentificationService.getIsConnectedObservable().subscribe(isConnected => {
       this.isConnected = isConnected;
     })
+
+    this.messageService.getUsersCorrespondances();
+
+    this.messageService.getUsersCorrespondancesObservable().subscribe(usersCorrespondances => {
+      this.usersCorrespondences = usersCorrespondances;
+    });
 
     this.messageService.getMessagesFilteredAndSorted();
 
@@ -141,5 +149,11 @@ export class MessageContainerComponent implements OnInit{
     } else {
       this.notificationService.publish("Impossible de liker : vous n'êtes pas connecté.");
     }
+  }
+
+  getUserCorrespondence(id: number) {
+    return (this?.usersCorrespondences.find(
+        (element) => element.id == id)
+    ).identifiant
   }
 }

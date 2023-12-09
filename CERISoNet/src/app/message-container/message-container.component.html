@@ -21,7 +21,7 @@
     <div class="btn-group my-1">
       <select class="btn btn-outline-dark col-6" [(ngModel)]="selectedOwner" (change)="filterMessages()">
         <option class="dropdown-item" [ngValue]="null">Tous les propriétaires</option>
-        <option class="dropdown-item" *ngFor="let owner of uniqueOwners" [ngValue]="owner">{{ owner }}</option>
+        <option class="dropdown-item" *ngFor="let owner of uniqueOwners" [ngValue]="owner">{{ getUserCorrespondence(owner) }}</option>
       </select>
       <select class="btn btn-outline-dark col-6" [(ngModel)]="selectedHashtag" (change)="filterMessages()">
         <option class="dropdown-item" [ngValue]="null">Tous les hashtags</option>
@@ -34,6 +34,7 @@
   *ngFor="let message of messagesShowed"
   [message]="message"
   [isConnected]="isConnected"
+  [usersCorrespondences]="usersCorrespondences"
   (likeMessageEvent)="likeMessage(message._id)">
 </app-message>
 <div class="row justify-content-center my-2">

@@ -15,6 +15,8 @@ export class MessageService {
   sorting$ = new BehaviorSubject<string>(null);
   sortingOrder$ = new BehaviorSubject<string>(null);
 
+  usersCorrespondancesSubject = new BehaviorSubject<any>(null);
+
   constructor(private httpClient: HttpClient) {}
 
   getMessagesFilteredAndSorted() {
@@ -29,11 +31,27 @@ export class MessageService {
     })
   }
 
+  getUsersCorrespondances() {
+    this.httpClient.get<any>('usersCorrespondences').subscribe({
+      next : response => {
+        let usersCorrespondences: any = [];
+        for (let userCorrespondence of response) {
+          usersCorrespondences.push(userCorrespondence);
+        }
+        this.usersCorrespondancesSubject.next(usersCorrespondences);
+      }
+    })
+  }
+
   initialisation(message: Message) {
     return { ...this.defaultMessage, ...message };
   }
 
   getMessagesObservable(): Observable<Message[]> {
     return this.messagesSubject.asObservable();
+  }
+
+  getUsersCorrespondancesObservable() {
+    return this.usersCorrespondancesSubject.asObservable();
   }
 }

@@ -306,6 +306,29 @@ app.get('/checkConnexion', (req, res) => {
   }
 })
 
+app.get('/usersCorrespondences', (req, res) => {
+  const connexionObj = new pgClient.Pool({user:'uapv2102872', host:'127.0.0.1', database:'etd', password: 'jhFP6M', port:5432});
+  connexionObj.connect((err, client, done) => {
+    if(err) {
+      console.log('Erreur de connexion au serveur pg' + err.stack);
+    } else {
+      console.log('Connexion établie / pg db server');
+
+      const usersCorrespondences = `SELECT id, identifiant from fredouil.users;`;
+
+      client.query(usersCorrespondences, (err, usersCorr) => {
+        if (err) {
+          console.log('Erreur lors de la récupération des correspondances utilisateurs.', err.stack);
+        } else {
+          console.log('Correspondances utilisateurs récupérés.');
+        }
+        res.send(usersCorr.rows);
+      });
+    }
+    client.release();
+  }
+)});
+
 app.get('/messages', async (req, res) => {
   try {
     const db = client.db(dbName);
