@@ -112,6 +112,7 @@ export class MessageContainerComponent implements OnInit{
     this.messageService.sortingOrder$.next(this.isSortAscending.toString())
     this.messageService.getMessagesFilteredAndSorted();
     this.messagesShowed = this.setIndex(this.messages);
+    this.currentPage = 1;
   }
 
   likeMessage(messageId: number) {
