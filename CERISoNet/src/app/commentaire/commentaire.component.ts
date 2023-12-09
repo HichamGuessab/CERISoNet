@@ -12,6 +12,7 @@ export class CommentaireComponent implements OnInit{
     @Input() messageId: number;
     @Input() commentaire: Commentaire;
     connectedUserId: number;
+    @Input() usersCorrespondences: any;
 
     constructor(
       private commentService: CommentService,
@@ -27,5 +28,14 @@ export class CommentaireComponent implements OnInit{
       this.commentService.deleteComment(this.messageId, this.commentaire, this.connectedUserId);
     }
 
+    getUserCorrespondence(id: number) {
+      const identifiant = (this?.usersCorrespondences?.find(
+          (element: { id: number; }) => element?.id == id)
+      )?.identifiant;
 
+      if (identifiant == null || identifiant == undefined) {
+        return "Auteur inconnu";
+      }
+      return identifiant;
+    }
 }

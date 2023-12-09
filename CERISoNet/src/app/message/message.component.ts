@@ -28,8 +28,8 @@ export class MessageComponent {
   }
 
   getUserCorrespondence(id: number) {
-    return (this?.usersCorrespondences.find(
+    return (this?.usersCorrespondences?.find(
         (element) => element.id == id)
-    ).identifiant;
+    )?.identifiant;
   }
 }

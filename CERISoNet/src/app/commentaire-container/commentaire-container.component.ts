@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Commentaire} from "../../models/commentaire.model";
 
 @Component({
@@ -10,4 +10,5 @@ export class CommentaireContainerComponent {
   @Input() openForm: boolean = true;
   @Input() messageId: number;
   @Input() openShareMessageForm: boolean;
+  @Input() usersCorrespondences: any;
 }

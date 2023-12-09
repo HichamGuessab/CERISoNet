@@ -3,7 +3,7 @@
     <p class="card-text px-3 pt-2 pb-0">{{ commentaire.text }}</p>
     <div class="row py-0">
       <p class="card-text col-lg-5 col-md-4 col-sm-4 col-xs-4 px-4">
-        <small class="text-muted">Auteur : {{ commentaire.commentedBy }}</small>
+        <small class="text-muted">Auteur : {{ getUserCorrespondence(commentaire.commentedBy) }}</small>
       </p>
       <p class="card-text col-lg-4 col-md-4 col-sm-5 col-xs-3">
         <small class="text-muted">Le {{ commentaire.date }} à {{ commentaire.hour }}</small>
