@@ -8,6 +8,14 @@
       <button class="btn btn-sm btn-outline-dark" (click)="nextPage()"
               [disabled]="!hasNextPage()">Suivant
       </button>
+      <select class="btn btn-outline-dark col-6 mx-2" [(ngModel)]="messagesPerPage">
+        <option class="dropdown-item" [ngValue]="4" (click)="filterMessages()">Postes par page</option>
+        <option class="dropdown-item" [ngValue]="4" (click)="filterMessages()">4</option>
+        <option class="dropdown-item" [ngValue]="5" (click)="filterMessages()">5</option>
+        <option class="dropdown-item" [ngValue]="6" (click)="filterMessages()">6</option>
+        <option class="dropdown-item" [ngValue]="7" (click)="filterMessages()">7</option>
+        <option class="dropdown-item" [ngValue]="8" (click)="filterMessages()">8</option>
+      </select>
     </div>
 
     <!-- Tri des messages -->
