@@ -1,11 +1,21 @@
 <app-header></app-header>
 <app-notification></app-notification>
 <div class="container-fluid">
-  <div class="row align-content-center">
-    <div class="col-12">
-      <div class="container">
-        <app-message-container></app-message-container>
-      </div>
+ <div class="row align-content-center">
+   <div class="col-12">
+     <div class="container"
+          *ngIf="isConnected == true; else notConnected">
+       <app-message-container></app-message-container>
+     </div>
+   </div>
+ </div>
+</div>
+
+<ng-template #notConnected>
+  <div class="card mt-5">
+    <div class="card-body text-center">
+      <h1 class="display-4 text-danger">Vous n'êtes pas connecté</h1>
+      <p class="lead">Pour accéder aux différents posts, veuillez vous connecter.</p>
     </div>
   </div>
-</div>
+</ng-template>
