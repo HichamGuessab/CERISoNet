@@ -9,7 +9,7 @@
         <small class="text-muted">Le {{ commentaire.date }} à {{ commentaire.hour }}</small>
       </p>
       <button class="btn btn-outline-dark col-lg-2 col-md-3 col-sm-3 col-xs-3"
-              *ngIf="commentaire.commentedBy == connectedUserId"
+              *ngIf="isConnected == true && commentaire.commentedBy == connectedUserId"
               (click)="deleteComment()">
         Supprimer
       </button>

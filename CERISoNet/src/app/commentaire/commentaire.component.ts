@@ -14,6 +14,8 @@ export class CommentaireComponent implements OnInit{
     connectedUserId: number;
     @Input() usersCorrespondences: any;
 
+    isConnected: boolean;
+
     constructor(
       private commentService: CommentService,
       private authentificationService: AuthentificationService) {}
@@ -22,6 +24,11 @@ export class CommentaireComponent implements OnInit{
       this.authentificationService.getIdSubject().subscribe( connectedUserId => {
         this.connectedUserId = connectedUserId;
       })
+
+      this.authentificationService.getIsConnectedObservable().subscribe(isConnected => {
+          this.isConnected = isConnected;
+        }
+      )
     }
 
     deleteComment() {
