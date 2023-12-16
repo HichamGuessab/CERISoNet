@@ -4,6 +4,9 @@
   <!-- Body -->
   <div class="row mx-2">
     <div class="card-body col-lg-9 col-md-8">
+      <p *ngIf="message.shared!=0">
+        Ce post est un partage.
+      </p>
       <p class="card-text"> {{ message.body}}</p>
     </div>
 
@@ -39,7 +42,7 @@
       <small>Commenter</small>
     </p>
     <p class="btn btn-sm btn-dark text-white col-xl-1 col-lg-2 col-md-2" (click)="openShareMessageForm = !openShareMessageForm">
-      <small>Partager ({{ message.shared }})</small>
+      <small>Partager</small>
     </p>
   </div>
 </div>
