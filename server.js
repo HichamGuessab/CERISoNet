@@ -11,8 +11,8 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session)
 const { client, dbName } = require('./mongodb.config.js');
 
-const app = express(); // appel à expressJS
-const port = 3201; // port définit
+const app = express();
+const port = 3201;
 
 const options = { // lecture clé privée et certificat
   key: fs.readFileSync('SSL_certificate/key.pem'),
@@ -30,7 +30,7 @@ server.listen(port, () => {
   console.log("Running on port", port)
 });
 
-// Gérer les sessions
+// Gestion des sessions via MongoDB
 app.use(session({
   secret:'ma phrase',
   saveUninitialized: false,
@@ -43,6 +43,7 @@ app.use(session({
   cookie : {maxAge : 24 * 3600 * 1000} // millisecond valeur par défaut
 }));
 
+// Connexion à la base de donnée MongoDB
 client.connect();
 
 // Accueil
@@ -51,7 +52,7 @@ app.get('/', (req, res) => {
   res.sendFile(indexPath);
 });
 
-// Connexion
+// Connexion de l'utilisateur
 app.post('/login', (req, res) => {
   const identifiant = req.body.identifiant;
   const motdepasse = sha1(req.body.mot_de_passe);
@@ -89,14 +90,12 @@ app.post('/login', (req, res) => {
           req.session.identifiant = identifiant;
           id = result.rows[0].id;
           req.session.identifiantPGSQL = id;
-          console.log(req.session)
 
           message = 'Connexion réussie : Bonjour '+ result.rows[0].prenom;
 
-          // Mettre à jour le statut de connexion dans la base de données
+          // Mise à jour du statut de connexion dans la base de données
           const updateSql = `UPDATE fredouil.users SET statut_connexion = 1 WHERE identifiant = '${identifiant}';`;
 
-          // UPDATE query
           client.query(updateSql, (err, updateResult) => {
             if (err) {
               console.log('Erreur lors de la mise à jour du statut de connexion :', err.stack);
@@ -119,145 +118,7 @@ app.post('/login', (req, res) => {
   })
 })
 
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({server: server});
-
-wss.on('connection', (socket) => {
-  console.log("Un client s'est connecté.");
-  socket.on('message', (data) => {
-    const dataString = data.toString();
-    const jsonData = JSON.parse(dataString);
-
-    if(jsonData.event === "likedMessage"){
-      wss.emit('likedMessage', jsonData);
-    }
-    if(jsonData.event === "shareMessage"){
-      console.log("Recu : ", jsonData);
-      wss.emit('shareMessage', jsonData)
-      console.log("Je suis sortie");
-    }
-  })
-})
-
-wss.on('userConnected', (socket) => {
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ type: 'usersConnected', data: socket }));
-    }
-  });
-})
-
-wss.on('likedMessage', async (data) => {
-  const messageId = data.messageId;
-  const like = data.like;
-  const db = client.db(dbName);
-  const collection = db.collection('CERISoNet');
-  try {
-    const query = { _id: messageId };
-    let update = {};
-    if(like) {
-      update = { $inc: { likes: 1 } }; // Incrémentation du nombre de likes
-    } else {
-      update = { $inc: { likes: -1 } }; // Décrémentation du nombre de likes
-    }
-    console.log(update);
-    const result = await collection.updateOne(query, update);
-    console.log(result);
-    if (result.matchedCount === 1) {
-      const updatedMessage = await collection.findOne(query);
-
-      // Envoie de la mise à jour aux clients connectés
-      wss.emit('messageLiked', {
-        message : "Vous avez liké un message.",
-        messageId: updatedMessage._id,
-        nbLikes: updatedMessage.likes,
-      });
-      console.log(updatedMessage.likes)
-    }
-  } catch (error) {
-    console.error('Erreur lors de la mise à jour du like', error);
-  }
-});
-
-wss.on('shareMessage', async (data) => {
-  console.log("yes je rentre");
-
-  console.log(data);
-
-  const newPost = {
-    date : dateFormat('yyyy-MM-dd', new Date()),
-    hour : dateFormat('hh:mm', new Date()),
-    createdBy : data.message.createdBy,
-    images: data.message.images,
-    likes : data.message.likes,
-    hashtags: data.message.hashtags,
-    body : data.message.body,
-    comments : data.message.comments,
-    shared : data.message.shared
-  }
-
-  console.log(newPost);
-
-  try {
-    const db = client.db(dbName);
-    const collection = db.collection('CERISoNet');
-
-    // Recherche du plus grand "_id" pour incrémenter dessus
-    const lastPost = await collection
-        .find({ _id: { $type: 'number' } })
-        .sort({ _id: -1 })
-        .limit(1)
-        .toArray();
-    let maxId = 1;
-
-    if (lastPost.length > 0) {
-      maxId = lastPost[0]._id + 1;
-    }
-    console.log(maxId);
-    newPost._id = maxId;
-    console.log(newPost);
-
-    const result = await collection.insertOne(newPost);
-
-    if (result.insertedCount === 1) {
-      console.log("Message partagé posté avec succès.")
-      wss.emit('messagePosted', {
-        message : "Vous avez posté un message partagé."
-      });
-    }
-  } catch (error) {
-    console.error('Erreur lors du partage du message :', error);
-  }
-})
-
-setInterval(() => {
-  const connexionObj = new pgClient.Pool({
-    user:'uapv2102872',
-    host:'127.0.0.1',
-    database:'etd',
-    password: 'jhFP6M',
-    port:5432
-  });
-
-  connexionObj.connect((err, client) => {
-    if (err) {
-      console.log('Erreur de connexion au serveur pg.');
-    } else {
-      client.query('SELECT * FROM fredouil.users WHERE statut_connexion = 1', (error, results) => {
-        if (error) {
-          console.error('Erreur lors de la récupération des utilisateurs connectés:', error);
-        } else {
-          const users = results.rows;
-          const identifiants = users.map(user => user.identifiant);
-          wss.emit('userConnected', {message: identifiants});
-        }
-      });
-    }
-    client.release();
-  });
-}, 2000);
-
-// Déconnexion
+// Déconnexion de l'utilisateur
 app.get('/logout', (req, res) => {
   if (req.session.isConnected) {
     const identifiant = req.session.identifiant;
@@ -270,7 +131,7 @@ app.get('/logout', (req, res) => {
         console.log('Connexion établie / pg db server');
 
         const updateSql = `UPDATE fredouil.users SET statut_connexion = 0 WHERE identifiant = '${identifiant}';`;
-  
+
         client.query(updateSql, (err, updateResult) => {
           if (err) {
             console.log('Erreur lors de la mise à jour du statut de connexion :', err.stack);
@@ -298,6 +159,145 @@ app.get('/logout', (req, res) => {
   }
 });
 
+
+// WebSockets
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({server: server});
+
+// WebSocket principale (chargé de récupérer chaque receive du client et d'emit en fonction)
+wss.on('connection', (socket) => {
+  console.log("Un client s'est connecté.");
+  socket.on('message', (data) => {
+    const dataString = data.toString();
+    const jsonData = JSON.parse(dataString);
+
+    if(jsonData.event === "likedMessage"){
+      wss.emit('likedMessage', jsonData);
+    }
+    if(jsonData.event === "shareMessage"){
+      console.log("Recu : ", jsonData);
+      wss.emit('shareMessage', jsonData)
+      console.log("Je suis sortie");
+    }
+  })
+})
+
+// WebSocket : Liker un Post
+wss.on('likedMessage', async (data) => {
+  const messageId = data.messageId;
+  const like = data.like;
+  const db = client.db(dbName);
+  const collection = db.collection('CERISoNet');
+  try {
+    const query = { _id: messageId };
+    let update = {};
+    if(like) {
+      update = { $inc: { likes: 1 } }; // Incrémentation du nombre de likes
+    } else {
+      update = { $inc: { likes: -1 } }; // Décrémentation du nombre de likes
+    }
+    const result = await collection.updateOne(query, update);
+    if (result.matchedCount === 1) {
+      const updatedMessage = await collection.findOne(query);
+
+      // Envoie de la mise à jour aux clients connectés
+      wss.emit('messageLiked', {
+        message : "Vous avez liké un message.",
+        messageId: updatedMessage._id,
+        nbLikes: updatedMessage.likes,
+      });
+    }
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du like', error);
+  }
+});
+
+// WebSocket : Partager un message
+wss.on('shareMessage', async (data) => {
+  console.log("yes je rentre");
+
+  const newPost = {
+    date : dateFormat('yyyy-MM-dd', new Date()),
+    hour : dateFormat('hh:mm', new Date()),
+    createdBy : data.message.createdBy,
+    images: data.message.images,
+    likes : data.message.likes,
+    hashtags: data.message.hashtags,
+    body : data.message.body,
+    comments : data.message.comments,
+    shared : data.message.shared
+  }
+
+  try {
+    const db = client.db(dbName);
+    const collection = db.collection('CERISoNet');
+
+    // Recherche du plus grand "_id" pour incrémenter dessus
+    const lastPost = await collection
+        .find({ _id: { $type: 'number' } })
+        .sort({ _id: -1 })
+        .limit(1)
+        .toArray();
+    let maxId = 1;
+
+    if (lastPost.length > 0) {
+      maxId = lastPost[0]._id + 1;
+    }
+    newPost._id = maxId;
+
+    const result = await collection.insertOne(newPost);
+
+    if (result.insertedCount === 1) {
+      console.log("Message partagé posté avec succès.")
+      wss.emit('messagePosted', {
+        message : "Vous avez posté un message partagé."
+      });
+    }
+  } catch (error) {
+    console.error('Erreur lors du partage du message :', error);
+  }
+})
+
+
+// WebSocket : Récupération des utilisateurs connectés
+wss.on('userConnected', (socket) => {
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: 'usersConnected', data: socket }));
+    }
+  });
+})
+
+// Récupération des utilisateurs connectés et emit de la websocket toutes les 2 secondes
+setInterval(() => {
+  const connexionObj = new pgClient.Pool({
+    user:'uapv2102872',
+    host:'127.0.0.1',
+    database:'etd',
+    password: 'jhFP6M',
+    port:5432
+  });
+
+  connexionObj.connect((err, client) => {
+    if (err) {
+      console.log('Erreur de connexion au serveur pg.');
+    } else {
+      client.query('SELECT * FROM fredouil.users WHERE statut_connexion = 1', (error, results) => {
+        if (error) {
+          console.error('Erreur lors de la récupération des utilisateurs connectés:', error);
+        } else {
+          const users = results.rows;
+          const identifiants = users.map(user => user.identifiant);
+          wss.emit('userConnected', {message: identifiants});
+        }
+      });
+    }
+    client.release();
+  });
+}, 2000);
+
+// Vérifier si l'utilisateur actuel est bien connecté (s'il possède une session en cours)
+// Renvoie de l'identifiant PostGreSQL de l'utilisateur si c'est bien le cas
 app.get('/checkConnexion', (req, res) => {
   if(req.session.isConnected) {
     res.send( { isConnected : true, identifiantPGSQL : req.session.identifiantPGSQL } )
@@ -306,6 +306,7 @@ app.get('/checkConnexion', (req, res) => {
   }
 })
 
+// Renvoyer les correspondances utilisateurs Identifiant avec id de chaque utilisateur.
 app.get('/usersCorrespondences', (req, res) => {
   const connexionObj = new pgClient.Pool({user:'uapv2102872', host:'127.0.0.1', database:'etd', password: 'jhFP6M', port:5432});
   connexionObj.connect((err, client, done) => {
@@ -329,6 +330,7 @@ app.get('/usersCorrespondences', (req, res) => {
   }
 )});
 
+// Récupération de tous les messages d'un seul coup (n'est plus utilisé)
 app.get('/messages', async (req, res) => {
   try {
     const db = client.db(dbName);
@@ -341,14 +343,13 @@ app.get('/messages', async (req, res) => {
   }
 })
 
-// Filtrage et Tri
+// Récupération des messages par Filtrage et Tri
 app.get('/messages/:owner/:hashtag/:sorting/:sortingOrder', async (req, res) => {
   const owner = req.params['owner'].toString();
   const hashtag = req.params['hashtag'];
   const sorting = req.params['sorting'];
   const sortingOrder = req.params['sortingOrder'];
 
-  console.log(owner, hashtag, sorting, sortingOrder);
   try {
     const db = client.db(dbName);
     const collection = db.collection('CERISoNet');
@@ -357,20 +358,17 @@ app.get('/messages/:owner/:hashtag/:sorting/:sortingOrder', async (req, res) => 
     let filterParams = {};
 
     if(hashtag !== 'null' && hashtag !== 'undefined') {
-      console.log("hashtag " + hashtag)
       filterParams.hashtags = {
         $all: ['#'+hashtag]
       };
     }
 
     if(owner !== 'null' && owner !== 'undefined') {
-      console.log("owner")
       filterParams.createdBy =
         parseInt(owner)
       ;
     }
 
-    console.log(filterParams)
 
     messages = await collection.find(
         filterParams
@@ -379,7 +377,6 @@ app.get('/messages/:owner/:hashtag/:sorting/:sortingOrder', async (req, res) => 
     console.log(messages)
 
     if (sorting !== 'null' && sortingOrder !== 'null') {
-      console.log("sortingAndSortingOrder")
       let sortParams = {};
       sortParams[sorting] = sortingOrder === 'true' ? -1 : 1;
 
@@ -404,6 +401,7 @@ app.get('/messages/:owner/:hashtag/:sorting/:sortingOrder', async (req, res) => 
   }
 })
 
+// Ajout d'un commentaire sur un post
 app.post('/messages/:messageId/comment', async (req, res) => {
   const param1 = req.params['messageId'];
   const { text, commentedBy } = req.body;
@@ -444,9 +442,12 @@ app.post('/messages/:messageId/comment', async (req, res) => {
   }
 });
 
+// Librairie d'encodage
+// Utilisé pour que les messages reçus soit sans caractère spécial
 const crypto = require('crypto-js');
 const encryptionKey = 'secretKey';
 
+// Suppression d'un commentaire
 app.delete('/messages/:messageId/:commentedBy/text/:commentText/date/:commentedDate/:commentedHour/deleteComment', async (req, res) => {
   const messageId = +req.params.messageId;
   const commentedBy = +req.params.commentedBy;
@@ -472,7 +473,6 @@ app.delete('/messages/:messageId/:commentedBy/text/:commentText/date/:commentedD
     let update;
     let result;
     if(commentedBy === 0 && commentText === "*^$²^s²df;²:pojn84g²1d5") {
-      console.log("Deux non renseignés.")
       update = {
         $pull: { comments: {  date: commentedDate, hour: commentedHour } },
       };
@@ -507,4 +507,3 @@ app.delete('/messages/:messageId/:commentedBy/text/:commentText/date/:commentedD
     res.status(500).json({ message: 'Erreur lors de la suppression du commentaire.' });
   }
 });
-
